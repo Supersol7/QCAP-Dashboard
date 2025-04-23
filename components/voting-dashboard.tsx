@@ -6,8 +6,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { LineChart, BarChart } from "@/components/ui/charts"
-import { Clock, Copy, ExternalLink } from "lucide-react"
+import { Clock, Copy, ExternalLink, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 // Mock data - replace with actual API calls
 const mockQcapStaked = 1250000
@@ -99,17 +105,76 @@ const mockAddressesEntitled = [
   "GFDSRG...MFHGH",
 ]
 
+// Add mock data for wallet staking and voting
+const mockWalletData = [
+  {
+    address: "GVWPFG...CHCNJ",
+    stakedAmount: 125000,
+    votingPower: 125000,
+    votingPowerPercentage: 10,
+    lastVote: "2024-03-15",
+    proposalsVoted: 12,
+    proposalsCreated: 2,
+    status: "active"
+  },
+  {
+    address: "FREFAF...ADFDS",
+    stakedAmount: 87500,
+    votingPower: 87500,
+    votingPowerPercentage: 7,
+    lastVote: "2024-03-14",
+    proposalsVoted: 8,
+    proposalsCreated: 1,
+    status: "active"
+  },
+  {
+    address: "GVWYER...YJTYJ",
+    stakedAmount: 62500,
+    votingPower: 62500,
+    votingPowerPercentage: 5,
+    lastVote: "2024-03-13",
+    proposalsVoted: 5,
+    proposalsCreated: 0,
+    status: "active"
+  },
+  {
+    address: "MSDFGS...RTESG",
+    stakedAmount: 50000,
+    votingPower: 50000,
+    votingPowerPercentage: 4,
+    lastVote: "2024-03-12",
+    proposalsVoted: 3,
+    proposalsCreated: 0,
+    status: "active"
+  },
+  {
+    address: "REGRGS...JMFDD",
+    stakedAmount: 37500,
+    votingPower: 37500,
+    votingPowerPercentage: 3,
+    lastVote: "2024-03-11",
+    proposalsVoted: 2,
+    proposalsCreated: 0,
+    status: "active"
+  }
+];
+
 export default function VotingDashboard() {
   const [historicalCount, setHistoricalCount] = useState(20)
   const [currentPage, setCurrentPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState<"all" | "passed" | "failed">("all")
   const [votersPage, setVotersPage] = useState(1)
+  const [copiedAddresses, setCopiedAddresses] = useState<Record<string, boolean>>({})
   const itemsPerPage = 5
   const votersPerPage = 5
   const [timePeriod, setTimePeriod] = useState("1D")
 
   const handleCopyAddress = (address: string) => {
     navigator.clipboard.writeText(address)
+    setCopiedAddresses(prev => ({ ...prev, [address]: true }))
+    setTimeout(() => {
+      setCopiedAddresses(prev => ({ ...prev, [address]: false }))
+    }, 2000)
   }
 
   const getExplorerLink = (address: string) => {
@@ -280,14 +345,27 @@ export default function VotingDashboard() {
                   <TableCell className="font-mono">
                     <div className="flex items-center gap-2">
                       {voter.id}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => handleCopyAddress(voter.id)}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => handleCopyAddress(voter.id)}
+                            >
+                              {copiedAddresses[voter.id] ? (
+                                <Check className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <Copy className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {copiedAddresses[voter.id] ? "Copied!" : "Copy address"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <a
                         href={getExplorerLink(voter.id)}
                         target="_blank"
@@ -682,72 +760,72 @@ export default function VotingDashboard() {
           <CardTitle>Wallet Staking & Voting</CardTitle>
           <CardDescription>Real-time data on wallet staking and voting power</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <h3 className="text-lg font-medium mb-2">Staked Amount per Wallet</h3>
-              <div className="h-[300px]">
-                <BarChart
-                  data={[
-                    { name: "Wallet 1", value: 45000 },
-                    { name: "Wallet 2", value: 125000 },
-                    { name: "Wallet 3", value: 15000 },
-                    { name: "Wallet 4", value: 85000 },
-                    { name: "Wallet 5", value: 2500 },
-                    { name: "Wallet 6", value: 95000 },
-                    { name: "Wallet 7", value: 35000 },
-                    { name: "Wallet 8", value: 105000 },
-                    { name: "Wallet 9", value: 7500 },
-                    { name: "Wallet 10", value: 115000 },
-                    { name: "Wallet 11", value: 25000 },
-                    { name: "Wallet 12", value: 75000 },
-                    { name: "Wallet 13", value: 5000 },
-                    { name: "Wallet 14", value: 65000 },
-                    { name: "Wallet 15", value: 20000 },
-                    { name: "Wallet 16", value: 55000 },
-                    { name: "Wallet 17", value: 10000 },
-                    { name: "Wallet 18", value: 40000 },
-                    { name: "Wallet 19", value: 30000 },
-                    { name: "Wallet 20", value: 12500 }
-                  ]}
-                  xField="name"
-                  yField="value"
-                  categories={["value"]}
-                />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-medium mb-2">Voting Power per Wallet</h3>
-              <div className="h-[300px]">
-                <BarChart
-                  data={[
-                    { name: "Wallet 1", value: 45000 },
-                    { name: "Wallet 2", value: 125000 },
-                    { name: "Wallet 3", value: 15000 },
-                    { name: "Wallet 4", value: 85000 },
-                    { name: "Wallet 5", value: 2500 },
-                    { name: "Wallet 6", value: 95000 },
-                    { name: "Wallet 7", value: 35000 },
-                    { name: "Wallet 8", value: 105000 },
-                    { name: "Wallet 9", value: 7500 },
-                    { name: "Wallet 10", value: 115000 },
-                    { name: "Wallet 11", value: 25000 },
-                    { name: "Wallet 12", value: 75000 },
-                    { name: "Wallet 13", value: 5000 },
-                    { name: "Wallet 14", value: 65000 },
-                    { name: "Wallet 15", value: 20000 },
-                    { name: "Wallet 16", value: 55000 },
-                    { name: "Wallet 17", value: 10000 },
-                    { name: "Wallet 18", value: 40000 },
-                    { name: "Wallet 19", value: 30000 },
-                    { name: "Wallet 20", value: 12500 }
-                  ]}
-                  xField="name"
-                  yField="value"
-                  categories={["value"]}
-                />
-              </div>
-            </div>
+        <CardContent>          
+          <div className="mt-6">
+            <h3 className="text-lg font-medium mb-4">Detailed Wallet Information</h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Wallet Address</TableHead>
+                  <TableHead>Staked Amount</TableHead>
+                  <TableHead>Voting Power</TableHead>
+                  <TableHead>Last Vote</TableHead>
+                  <TableHead>Proposals Voted</TableHead>
+                  <TableHead>Proposals Created</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mockWalletData.map((wallet) => (
+                  <TableRow key={wallet.address}>
+                    <TableCell className="font-mono">
+                      <div className="flex items-center gap-2">
+                        {wallet.address}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => handleCopyAddress(wallet.address)}
+                              >
+                                {copiedAddresses[wallet.address] ? (
+                                  <Check className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {copiedAddresses[wallet.address] ? "Copied!" : "Copy address"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </TableCell>
+                    <TableCell>{wallet.stakedAmount.toLocaleString()} QCAP</TableCell>
+                    <TableCell>
+                      {wallet.votingPower.toLocaleString()} QCAP
+                      <div className="w-24 h-1.5 bg-muted rounded-full mt-1">
+                        <div 
+                          className="h-1.5 bg-primary rounded-full"
+                          style={{ width: `${wallet.votingPowerPercentage}%` }}
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell>{wallet.lastVote}</TableCell>
+                    <TableCell>{wallet.proposalsVoted}</TableCell>
+                    <TableCell>{wallet.proposalsCreated}</TableCell>
+                    <TableCell>
+                      <Badge variant={wallet.status === "active" ? "default" : "outline"}>
+                        {wallet.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>
@@ -768,11 +846,34 @@ export default function VotingDashboard() {
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono">{address}</span>
-                  {address === "0xConnectedWallet" && (
-                    <Badge variant="outline" className="bg-primary/20">
-                      Connected
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {address === "0xConnectedWallet" && (
+                      <Badge variant="outline" className="bg-primary/20">
+                        Connected
+                      </Badge>
+                    )}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleCopyAddress(address)}
+                          >
+                            {copiedAddresses[address] ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {copiedAddresses[address] ? "Copied!" : "Copy address"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </div>
               </div>
             ))}
