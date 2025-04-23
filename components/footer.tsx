@@ -7,16 +7,16 @@ import { Twitter, Linkedin, Github, DiscIcon as Discord } from "lucide-react"
 export function Footer() {
   return (
     <footer className="border-t border-slate-800 bg-background px-4 py-12 md:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl gap-8 text-center md:text-left md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Link href="/" className="mb-4 flex items-center gap-2">
+          <Link href="/" className="mb-4 flex items-center gap-2 justify-center md:justify-start">
             <Image src="/logo.gif" alt="Qubic Capital Logo" width={32} height={32} className="h-8 w-8" />
             <span className="text-lg font-bold text-white">Qubic Capital</span>
           </Link>
           <p className="mb-4 text-sm text-slate-400">
             Empowering our community to invest in premium assets through fractional ownership and decentralized finance.
           </p>
-          <div className="flex gap-4">
+          <div className="flex gap-4 justify-center md:justify-start">
             <Link
               href="#"
               className="rounded-full bg-slate-800 p-2 text-slate-400 transition-colors hover:bg-purple-500/20 hover:text-purple-400"
