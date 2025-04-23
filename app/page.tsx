@@ -5,6 +5,9 @@ import GeneralDataDashboard from "@/components/general-data-dashboard"
 import QearnDashboard from "@/components/qearn-dashboard"
 import { Button } from "@/components/ui/button"
 import { FileText, Wallet } from "lucide-react"
+import Image from "next/image"
+import { Input } from "@/components/ui/input"
+import Link from "next/link"
 
 export default function Home() {
   return (
@@ -12,6 +15,13 @@ export default function Home() {
       <header className="sticky top-0 z-10 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
+            <Image
+              src="/logo.gif"
+              alt="QCAP Logo"
+              width={48}
+              height={48}
+              className="h-12 w-12"
+            />
             <div className="text-primary font-bold text-2xl glow-text">QCAP</div>
             <div className="text-xl font-bold">Analytics Dashboard</div>
           </div>
@@ -57,22 +67,6 @@ export default function Home() {
           </TabsContent>
         </Tabs>
       </main>
-      <footer className="border-t border-border/40 py-4">
-        <div className="container flex justify-between items-center">
-          <div className="text-sm text-muted-foreground">© 2024 QCAP Analytics. All rights reserved.</div>
-          <div className="flex gap-4">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-              Twitter
-            </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-              Discord
-            </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-              Telegram
-            </Button>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

@@ -441,8 +441,8 @@ export default function GeneralDataDashboard() {
         <CardContent>
           <div className="space-y-4">
             <div>
-              <div className="text-sm font-medium">Muslim Restricted</div>
-              <div className="text-2xl font-bold">{mockMarketData.restrictedRevenue.muslim.toLocaleString()} Qu</div>
+              <p className="text-sm font-medium">Muslim Restricted</p>
+              <p className="text-2xl font-bold">{mockMarketData.restrictedRevenue.muslim.toLocaleString()} Qu</p>
             </div>
           </div>
         </CardContent>
