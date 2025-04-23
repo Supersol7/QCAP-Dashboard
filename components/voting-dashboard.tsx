@@ -35,10 +35,10 @@ const mockProposals = [
     id: "QCAP-1",
     title: "Increase staking rewards",
     status: "Active",
-    votesFor: 375000,
-    votesAgainst: 125000,
-    quorum: 500000,
-    quorumRequired: 400000,
+    participatingComputers: 450, // Out of 676 total computers
+    votesFor: 280,
+    votesAgainst: 170,
+    totalComputers: 676,
     timeRemaining: "2 days",
     fee: 100,
     type: "Parameter Change",
@@ -47,10 +47,10 @@ const mockProposals = [
     id: "QCAP-2",
     title: "Add new asset type",
     status: "Active",
-    votesFor: 250000,
-    votesAgainst: 50000,
-    quorum: 300000,
-    quorumRequired: 400000,
+    participatingComputers: 320,
+    votesFor: 180,
+    votesAgainst: 140,
+    totalComputers: 676,
     timeRemaining: "3 days",
     fee: 200,
     type: "Asset Addition",
@@ -59,10 +59,10 @@ const mockProposals = [
     id: "QCAP-3",
     title: "Modify governance rules",
     status: "Completed",
-    votesFor: 625000,
-    votesAgainst: 125000,
-    quorum: 750000,
-    quorumRequired: 400000,
+    participatingComputers: 520,
+    votesFor: 380,
+    votesAgainst: 140,
+    totalComputers: 676,
     timeRemaining: "0 days",
     fee: 150,
     type: "Governance",
@@ -71,13 +71,24 @@ const mockProposals = [
 
 const mockHistoricalProposals = Array(20)
   .fill(null)
-  .map((_, i) => ({
-    id: `QCAP-${i + 1}`,
-    title: `Historical Proposal ${i + 1}`,
-    status: Math.random() > 0.3 ? "Passed" : "Failed",
-    votesFor: Math.floor(Math.random() * 800000),
-    votesAgainst: Math.floor(Math.random() * 400000),
-  }))
+  .map((_, i) => {
+    // Random number of participating computers (between 100 and 676)
+    const participatingComputers = Math.floor(Math.random() * (676 - 100) + 100)
+    // Random number of votes in favor (between 0 and participating computers)
+    const votesFor = Math.floor(Math.random() * participatingComputers)
+    // Calculate if passed (more than 50% of participating voted in favor)
+    const passed = votesFor > participatingComputers / 2
+
+    return {
+      id: `QCAP-${i + 1}`,
+      title: `Historical Proposal ${i + 1}`,
+      status: passed ? "Passed" : "Failed",
+      participatingComputers,
+      votesFor,
+      votesAgainst: participatingComputers - votesFor,
+      totalComputers: 676 // Total available computers
+    }
+  })
 
 const mockAddressesEntitled = [
   "GVWPFG...CHCNJ",
@@ -408,7 +419,7 @@ export default function VotingDashboard() {
       <Card className="lg:col-span-3">
         <CardHeader>
           <CardTitle>Active Proposals</CardTitle>
-          <CardDescription>Live results of each proposal</CardDescription>
+          <CardDescription>Live results of each proposal (Total Computers: 676)</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-8">
@@ -418,7 +429,7 @@ export default function VotingDashboard() {
                 <div key={proposal.id} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Badge variant={proposal.quorum >= proposal.quorumRequired ? "default" : "outline"}>
+                      <Badge variant={proposal.votesFor > proposal.participatingComputers / 2 ? "default" : "outline"}>
                         {proposal.id}
                       </Badge>
                       <h3 className="font-semibold">{proposal.title}</h3>
@@ -431,35 +442,40 @@ export default function VotingDashboard() {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Participation Rate */}
                   <div className="flex justify-between text-sm">
-                    <span>For: {proposal.votesFor.toLocaleString()} QCAP</span>
-                    <span>Against: {proposal.votesAgainst.toLocaleString()} QCAP</span>
-                    <span>
-                      Quorum: {proposal.quorum.toLocaleString()} / {proposal.quorumRequired.toLocaleString()}
-                    </span>
+                    <span>Participation: {proposal.participatingComputers} / {proposal.totalComputers} computers</span>
+                    <span>{Math.round((proposal.participatingComputers / proposal.totalComputers) * 100)}%</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="w-full bg-muted rounded-full h-2.5">
+                      <div
+                        className="bg-primary/50 h-2.5 rounded-full"
+                        style={{ width: `${(proposal.participatingComputers / proposal.totalComputers) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  {/* Voting Results */}
+                  <div className="flex justify-between text-sm">
+                    <span>Votes: For {proposal.votesFor} / Against {proposal.votesAgainst}</span>
+                    <span>{Math.round((proposal.votesFor / proposal.participatingComputers) * 100)}% in favor</span>
                   </div>
                   <div className="flex gap-2">
                     <div className="w-full bg-muted rounded-full h-2.5">
                       <div
                         className="bg-primary h-2.5 rounded-full"
-                        style={{ width: `${(proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100}%` }}
+                        style={{ width: `${(proposal.votesFor / proposal.participatingComputers) * 100}%` }}
                       ></div>
-                    </div>
-                    <div className="w-24 text-sm text-right">
-                      {Math.round((proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100)}%
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <div className="w-full bg-muted rounded-full h-2.5">
-                      <div
-                        className="bg-primary h-2.5 rounded-full"
-                        style={{
-                          width: `${(proposal.quorum / proposal.quorumRequired) * 100 > 100 ? 100 : (proposal.quorum / proposal.quorumRequired) * 100}%`,
-                        }}
-                      ></div>
-                    </div>
-                    <div className="w-24 text-sm text-right">
-                      {Math.round((proposal.quorum / proposal.quorumRequired) * 100)}%
+
+                  {/* Pass Threshold Indicator */}
+                  <div className="relative w-full">
+                    <div className="absolute top-[-20px] left-1/2 w-px h-4 bg-red-500"></div>
+                    <div className="absolute top-[-10px] left-1/2 transform -translate-x-1/2 text-xs text-primary/50">
+                      50% threshold
                     </div>
                   </div>
                 </div>
@@ -472,7 +488,7 @@ export default function VotingDashboard() {
         <CardHeader>
           <CardTitle>Historical Proposals</CardTitle>
           <CardDescription className="flex items-center justify-between">
-            <span>Track of the last {historicalCount} proposals and their results</span>
+            <span>Track of the last {historicalCount} proposals and their results (Total Computers: 676)</span>
             <div className="flex gap-2">
               <Select
                 value={statusFilter}
@@ -489,9 +505,7 @@ export default function VotingDashboard() {
               </Select>
               <Select
                 defaultValue={historicalCount.toString()}
-                onValueChange={(value) => {
-                  setHistoricalCount(Number.parseInt(value))
-                }}
+                onValueChange={(value) => setHistoricalCount(Number.parseInt(value))}
               >
                 <SelectTrigger className="w-20 bg-secondary border-border/50">
                   <SelectValue placeholder="20" />
@@ -513,7 +527,8 @@ export default function VotingDashboard() {
                 <TableHead>ID</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Votes</TableHead>
+                <TableHead>Participation</TableHead>
+                <TableHead>Votes (For/Against)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -522,10 +537,27 @@ export default function VotingDashboard() {
                   <TableCell className="font-mono">{proposal.id}</TableCell>
                   <TableCell>{proposal.title}</TableCell>
                   <TableCell>
-                    <Badge variant={proposal.status === "Passed" ? "default" : "destructive"}>{proposal.status}</Badge>
+                    <Badge variant={proposal.status === "Passed" ? "default" : "destructive"}>
+                      {proposal.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {proposal.participatingComputers} / {proposal.totalComputers}
+                    <div className="w-24 h-1.5 bg-muted rounded-full mt-1">
+                      <div 
+                        className="h-1.5 bg-primary rounded-full"
+                        style={{ width: `${(proposal.participatingComputers / proposal.totalComputers) * 100}%` }}
+                      />
+                    </div>
                   </TableCell>
                   <TableCell>
                     {proposal.votesFor.toLocaleString()} / {proposal.votesAgainst.toLocaleString()}
+                    <div className="w-24 h-1.5 bg-muted rounded-full mt-1">
+                      <div 
+                        className="h-1.5 bg-primary rounded-full"
+                        style={{ width: `${(proposal.votesFor / proposal.participatingComputers) * 100}%` }}
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
