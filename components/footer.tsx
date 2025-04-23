@@ -10,9 +10,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <Link href="/" className="mb-4 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center">
-              <Image src="/logo.gif" alt="Qubic Capital Logo" width={32} height={32} className="h-8 w-8" />
-            </div>
+            <Image src="/logo.gif" alt="Qubic Capital Logo" width={32} height={32} className="h-8 w-8" />
             <span className="text-lg font-bold text-white">Qubic Capital</span>
           </Link>
           <p className="mb-4 text-sm text-slate-400">
@@ -77,7 +75,7 @@ export function Footer() {
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">
             Subscribe to our newsletter
           </h3>
-          <p className="mb-4 text-sm text-slate-400">Get the latest updates and news directly to your inbox.</p>
+          <div className="mb-4 text-sm text-slate-400">Get the latest updates and news directly to your inbox.</div>
           <div className="flex flex-col gap-2">
             <Input
               type="email"
@@ -91,7 +89,7 @@ export function Footer() {
         </div>
       </div>
       <div className="mx-auto mt-12 max-w-7xl border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
-        <p>© {new Date().getFullYear()} Qubic Capital. All rights reserved.</p>
+        <span>© {new Date().getFullYear()} Qubic Capital. All rights reserved.</span>
       </div>
     </footer>
   )

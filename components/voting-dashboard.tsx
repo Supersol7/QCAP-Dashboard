@@ -97,12 +97,12 @@ const mockHistoricalProposals = Array(20)
   })
 
 const mockAddressesEntitled = [
-  "GVWPFG...CHCNJ",
-  "FREFAF...ADFDS",
-  "GVWYER...YJTYJ",
-  "MSDFGS...RTESG",
-  "REGRGS...JMFDD",
-  "GFDSRG...MFHGH",
+  "PLXEGMWKWTEFOALGIKWFOJSMGQTCHQTUXVPLSPMJGBJDNPJBXYSQLPUBAZGK",
+  "PLXEGMWKWTEFOALGIKWFOJSMGQTCHQTUXVPLSPMJGBSDFSJBXYSQLPUBAZGK",
+  "PLXEGMWKWTEFOALGIKWFOJSMGQTCHQTUXVPLSPMJASDANPJBXYSQLPUBAZGK",
+  "PLXEGMWKWTEFOALGIKWFOJSMGQTCHQTUXVPLSPMJGFJDNPJBXYSQLPUBAZGK",
+  "PLXEGMWKWTEFOALGIKWFOJSMGQTCHQTUXVPDFSSJGBJDNPJBXYSQLPUBAZGK",
+  "PLXEGMWKWTEFOALGIKWFOJSMGQTCHQTUXVPLTREJGBJDNPJBXYSQLPUBAZGK",
 ]
 
 // Add mock data for wallet staking and voting
@@ -285,21 +285,21 @@ export default function VotingDashboard() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <Card className="lg:col-span-3">
+    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <Card className="col-span-1 md:col-span-2 lg:col-span-3">
         <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
             <div>
               <CardTitle>QCAP Staked in Real Time</CardTitle>
               <CardDescription>Total amount of QCAP currently staked in the system</CardDescription>
             </div>
-            <div className="flex bg-[#1a1625] rounded-md p-1">
+            <div className="flex flex-wrap bg-[#1a1625] rounded-md p-1">
               {["1D", "7D", "1M", "1Y", "All"].map((period) => (
                 <Button
                   key={period}
                   variant="ghost"
                   size="sm"
-                  className={`px-3 h-7 rounded-[4px] text-sm font-medium ${
+                  className={`px-2 h-7 rounded-[4px] text-sm font-medium ${
                     timePeriod === period 
                       ? "bg-[#8b5cf6] text-white" 
                       : "text-gray-400 hover:text-white hover:bg-[#2a2635]"
@@ -314,74 +314,78 @@ export default function VotingDashboard() {
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold text-primary glow-text">{mockQcapStaked.toLocaleString()}</div>
-          <div className="mt-4 h-[200px]">
-            <LineChart
-              data={getTimeRangeData(timePeriod)}
-              xField="time"
-              yField="value"
-              categories={["value"]}
-            />
+          <div className="mt-4 h-[200px] w-full overflow-x-auto">
+            <div className="min-w-[500px] h-full">
+              <LineChart
+                data={getTimeRangeData(timePeriod)}
+                xField="time"
+                yField="value"
+                categories={["value"]}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-2">
+      <Card className="col-span-1 md:col-span-2">
         <CardHeader>
           <CardTitle>IDs with Voting Power</CardTitle>
           <CardDescription>List of IDs with their voting power for the current epoch</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Voting Power</TableHead>
-                <TableHead>Percentage</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentVoters.map((voter) => (
-                <TableRow key={voter.id}>
-                  <TableCell className="font-mono">
-                    <div className="flex items-center gap-2">
-                      {voter.id}
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => handleCopyAddress(voter.id)}
-                            >
-                              {copiedAddresses[voter.id] ? (
-                                <Check className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <Copy className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {copiedAddresses[voter.id] ? "Copied!" : "Copy address"}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <a
-                        href={getExplorerLink(voter.id)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-primary"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </div>
-                  </TableCell>
-                  <TableCell>{voter.votingPower.toLocaleString()}</TableCell>
-                  <TableCell>{voter.percentage}%</TableCell>
+        <CardContent className="overflow-x-auto">
+          <div className="min-w-[600px]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Voting Power</TableHead>
+                  <TableHead>Percentage</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {currentVoters.map((voter) => (
+                  <TableRow key={voter.id}>
+                    <TableCell className="font-mono">
+                      <div className="flex items-center gap-2">
+                        {voter.id}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => handleCopyAddress(voter.id)}
+                              >
+                                {copiedAddresses[voter.id] ? (
+                                  <Check className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {copiedAddresses[voter.id] ? "Copied!" : "Copy address"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <a
+                          href={getExplorerLink(voter.id)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-muted-foreground hover:text-primary"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </div>
+                    </TableCell>
+                    <TableCell>{voter.votingPower.toLocaleString()}</TableCell>
+                    <TableCell>{voter.percentage}%</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
           <div className="flex items-center justify-between mt-4">
             <div className="text-sm text-muted-foreground">
               Showing {voterStartIndex + 1}-{Math.min(voterEndIndex, mockVoters.length)} of {mockVoters.length} voters
@@ -456,7 +460,7 @@ export default function VotingDashboard() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="col-span-1">
         <CardHeader>
           <CardTitle>Quorum Requirements</CardTitle>
           <CardDescription>Current quorum settings for proposals</CardDescription>
@@ -494,13 +498,13 @@ export default function VotingDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-3">
+      <Card className="col-span-1 md:col-span-2 lg:col-span-3">
         <CardHeader>
           <CardTitle>Active Proposals</CardTitle>
           <CardDescription>Live results of each proposal (Total Computers: 676)</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-8">
+        <CardContent className="overflow-x-auto">
+          <div className="min-w-[600px] space-y-8">
             {mockProposals
               .filter((p) => p.status === "Active")
               .map((proposal) => (
@@ -562,11 +566,11 @@ export default function VotingDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-2">
+      <Card className="col-span-1 md:col-span-2">
         <CardHeader>
           <CardTitle>Historical Proposals</CardTitle>
-          <CardDescription className="flex items-center justify-between">
-            <span>Track of the last {historicalCount} proposals and their results (Total Computers: 676)</span>
+          <CardDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <span>Track of the last {historicalCount} proposals and their results</span>
             <div className="flex gap-2">
               <Select
                 value={statusFilter}
@@ -598,49 +602,51 @@ export default function VotingDashboard() {
             </div>
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Participation</TableHead>
-                <TableHead>Votes (For/Against)</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentProposals.map((proposal) => (
-                <TableRow key={proposal.id}>
-                  <TableCell className="font-mono">{proposal.id}</TableCell>
-                  <TableCell>{proposal.title}</TableCell>
-                  <TableCell>
-                    <Badge variant={proposal.status === "Passed" ? "default" : "destructive"}>
-                      {proposal.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {proposal.participatingComputers} / {proposal.totalComputers}
-                    <div className="w-24 h-1.5 bg-muted rounded-full mt-1">
-                      <div 
-                        className="h-1.5 bg-primary rounded-full"
-                        style={{ width: `${(proposal.participatingComputers / proposal.totalComputers) * 100}%` }}
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {proposal.votesFor.toLocaleString()} / {proposal.votesAgainst.toLocaleString()}
-                    <div className="w-24 h-1.5 bg-muted rounded-full mt-1">
-                      <div 
-                        className="h-1.5 bg-primary rounded-full"
-                        style={{ width: `${(proposal.votesFor / proposal.participatingComputers) * 100}%` }}
-                      />
-                    </div>
-                  </TableCell>
+        <CardContent className="overflow-x-auto">
+          <div className="min-w-[800px]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Participation</TableHead>
+                  <TableHead>Votes (For/Against)</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {currentProposals.map((proposal) => (
+                  <TableRow key={proposal.id}>
+                    <TableCell className="font-mono">{proposal.id}</TableCell>
+                    <TableCell>{proposal.title}</TableCell>
+                    <TableCell>
+                      <Badge variant={proposal.status === "Passed" ? "default" : "destructive"}>
+                        {proposal.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {proposal.participatingComputers} / {proposal.totalComputers}
+                      <div className="w-24 h-1.5 bg-muted rounded-full mt-1">
+                        <div 
+                          className="h-1.5 bg-primary rounded-full"
+                          style={{ width: `${(proposal.participatingComputers / proposal.totalComputers) * 100}%` }}
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {proposal.votesFor.toLocaleString()} / {proposal.votesAgainst.toLocaleString()}
+                      <div className="w-24 h-1.5 bg-muted rounded-full mt-1">
+                        <div 
+                          className="h-1.5 bg-primary rounded-full"
+                          style={{ width: `${(proposal.votesFor / proposal.participatingComputers) * 100}%` }}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
           <div className="flex items-center justify-between mt-4">
             <div className="text-sm text-muted-foreground">
               Showing {startIndex + 1}-{Math.min(endIndex, filteredProposals.length)} of {filteredProposals.length} proposals
@@ -715,7 +721,7 @@ export default function VotingDashboard() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="col-span-1">
         <CardHeader>
           <CardTitle>Proposal Fees</CardTitle>
           <CardDescription>Fees and time for each type of proposal</CardDescription>
@@ -755,13 +761,13 @@ export default function VotingDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-3">
+      <Card className="col-span-1 md:col-span-2 lg:col-span-3">
         <CardHeader>
           <CardTitle>Wallet Staking & Voting</CardTitle>
           <CardDescription>Real-time data on wallet staking and voting power</CardDescription>
         </CardHeader>
-        <CardContent>          
-          <div className="mt-6">
+        <CardContent className="overflow-x-auto">          
+          <div className="mt-6 min-w-[900px]">
             <h3 className="text-lg font-medium mb-4">Detailed Wallet Information</h3>
             <Table>
               <TableHeader>
@@ -830,51 +836,19 @@ export default function VotingDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-3">
+      <Card className="col-span-1 md:col-span-2 lg:col-span-3">
         <CardHeader>
           <CardTitle>Addresses Entitled to Raise Proposals</CardTitle>
           <CardDescription>List of addresses that can create new proposals</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {mockAddressesEntitled.map((address, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {mockAddressesEntitled.map((address) => (
               <div
                 key={address}
-                className={`p-3 rounded-md border ${
-                  address === "0xConnectedWallet" ? "bg-primary/10 border-primary" : "border-border/50"
-                }`}
+                className="p-3 rounded-md border break-all"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono">{address}</span>
-                  <div className="flex items-center gap-2">
-                    {address === "0xConnectedWallet" && (
-                      <Badge variant="outline" className="bg-primary/20">
-                        Connected
-                      </Badge>
-                    )}
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => handleCopyAddress(address)}
-                          >
-                            {copiedAddresses[address] ? (
-                              <Check className="h-4 w-4 text-green-500" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {copiedAddresses[address] ? "Copied!" : "Copy address"}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </div>
+                <span className="font-mono text-sm">{address}</span>
               </div>
             ))}
           </div>
