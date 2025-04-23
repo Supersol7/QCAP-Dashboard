@@ -11,6 +11,17 @@ import { Button } from "@/components/ui/button"
 
 // Mock data - replace with actual API calls
 const mockQcapStaked = 1250000
+
+const mockTimeSeriesData = [
+  { time: "2025/04/21 00:00", value: 500000 },
+  { time: "2025/04/22 60:00", value: 670000 },
+  { time: "2025/04/23 12:00", value: 935000 },
+  { time: "2025/04/24 15:00", value: 1040000 },
+  { time: "2025/04/25 20:00", value: 1245000 },
+  { time: "2025/04/26 23:00", value: 2250000 },
+]
+
+
 const mockVoters = [
   { id: "GVWPFG...CHCNJ", votingPower: 125000, percentage: 10 },
   { id: "FREFAF...ADFDS", votingPower: 87500, percentage: 7 },
@@ -84,6 +95,7 @@ export default function VotingDashboard() {
   const [votersPage, setVotersPage] = useState(1)
   const itemsPerPage = 5
   const votersPerPage = 5
+  const [timePeriod, setTimePeriod] = useState("1D")
 
   const handleCopyAddress = (address: string) => {
     navigator.clipboard.writeText(address)
@@ -117,26 +129,97 @@ export default function VotingDashboard() {
     setCurrentPage(1)
   }, [statusFilter, historicalCount])
 
+  const getTimeRangeData = (period: string) => {
+    const now = new Date()
+    const data = []
+    
+    switch (period) {
+      case "1D":
+        // 24 hourly points for 1 day
+        for (let i = 24; i >= 0; i--) {
+          const time = new Date(now.getTime() - (i * 60 * 60 * 1000))
+          data.push({
+            time: time.toISOString().slice(0, 19).replace('T', ' '),
+            value: Math.floor(500000 + Math.random() * 1750000) // Random value between 500K and 2.25M
+          })
+        }
+        break
+        
+      case "7D":
+        // 7 daily points
+        for (let i = 7; i >= 0; i--) {
+          const time = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000))
+          data.push({
+            time: time.toISOString().slice(0, 19).replace('T', ' '),
+            value: Math.floor(500000 + Math.random() * 1750000)
+          })
+        }
+        break
+        
+      case "1M":
+        // 30 daily points
+        for (let i = 30; i >= 0; i--) {
+          const time = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000))
+          data.push({
+            time: time.toISOString().slice(0, 19).replace('T', ' '),
+            value: Math.floor(500000 + Math.random() * 1750000)
+          })
+        }
+        break
+        
+      case "1Y":
+        // 12 monthly points
+        for (let i = 12; i >= 0; i--) {
+          const time = new Date(now.getTime() - (i * 30 * 24 * 60 * 60 * 1000))
+          data.push({
+            time: time.toISOString().slice(0, 19).replace('T', ' '),
+            value: Math.floor(500000 + Math.random() * 1750000)
+          })
+        }
+        break
+        
+      case "All":
+        // Use all available historical data
+        return mockTimeSeriesData
+    }
+    
+    return data
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <Card className="lg:col-span-3">
         <CardHeader>
-          <CardTitle>QCAP Staked in Real Time</CardTitle>
-          <CardDescription>Total amount of QCAP currently staked in the system</CardDescription>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <CardTitle>QCAP Staked in Real Time</CardTitle>
+              <CardDescription>Total amount of QCAP currently staked in the system</CardDescription>
+            </div>
+            <div className="flex bg-[#1a1625] rounded-md p-1">
+              {["1D", "7D", "1M", "1Y", "All"].map((period) => (
+                <Button
+                  key={period}
+                  variant="ghost"
+                  size="sm"
+                  className={`px-3 h-7 rounded-[4px] text-sm font-medium ${
+                    timePeriod === period 
+                      ? "bg-[#8b5cf6] text-white" 
+                      : "text-gray-400 hover:text-white hover:bg-[#2a2635]"
+                  }`}
+                  onClick={() => setTimePeriod(period)}
+                >
+                  {period}
+                </Button>
+              ))}
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold text-primary glow-text">{mockQcapStaked.toLocaleString()}</div>
           <div className="mt-4 h-[200px]">
             <LineChart
-              data={[
-                { name: "00:00", value: 500000 },
-                { name: "04:00", value: 670000 },
-                { name: "08:00", value: 935000 },
-                { name: "12:00", value: 1040000 },
-                { name: "16:00", value: 1245000 },
-                { name: "20:00", value: 2250000 },
-              ]}
-              xField="name"
+              data={getTimeRangeData(timePeriod)}
+              xField="time"
               yField="value"
               categories={["value"]}
             />
@@ -552,11 +635,26 @@ export default function VotingDashboard() {
               <div className="h-[300px]">
                 <BarChart
                   data={[
-                    { name: "REGRGS...JMFDD", value: 125000 },
-                    { name: "REGRGS...JMFDD", value: 87500 },
-                    { name: "REGRGS...JMFDD", value: 62500 },
-                    { name: "REGRGS...JMFDD", value: 50000 },
-                    { name: "REGRGS...JMFDD", value: 37500 },
+                    { name: "Wallet 1", value: 45000 },
+                    { name: "Wallet 2", value: 125000 },
+                    { name: "Wallet 3", value: 15000 },
+                    { name: "Wallet 4", value: 85000 },
+                    { name: "Wallet 5", value: 2500 },
+                    { name: "Wallet 6", value: 95000 },
+                    { name: "Wallet 7", value: 35000 },
+                    { name: "Wallet 8", value: 105000 },
+                    { name: "Wallet 9", value: 7500 },
+                    { name: "Wallet 10", value: 115000 },
+                    { name: "Wallet 11", value: 25000 },
+                    { name: "Wallet 12", value: 75000 },
+                    { name: "Wallet 13", value: 5000 },
+                    { name: "Wallet 14", value: 65000 },
+                    { name: "Wallet 15", value: 20000 },
+                    { name: "Wallet 16", value: 55000 },
+                    { name: "Wallet 17", value: 10000 },
+                    { name: "Wallet 18", value: 40000 },
+                    { name: "Wallet 19", value: 30000 },
+                    { name: "Wallet 20", value: 12500 }
                   ]}
                   xField="name"
                   yField="value"
@@ -569,11 +667,26 @@ export default function VotingDashboard() {
               <div className="h-[300px]">
                 <BarChart
                   data={[
-                    { name: "REGRGS...JMFDD", value: 125000 },
-                    { name: "REGRGS...JMFDD", value: 87500 },
-                    { name: "REGRGS...JMFDD", value: 62500 },
-                    { name: "REGRGS...JMFDD", value: 50000 },
-                    { name: "REGRGS...JMFDD", value: 37500 },
+                    { name: "Wallet 1", value: 45000 },
+                    { name: "Wallet 2", value: 125000 },
+                    { name: "Wallet 3", value: 15000 },
+                    { name: "Wallet 4", value: 85000 },
+                    { name: "Wallet 5", value: 2500 },
+                    { name: "Wallet 6", value: 95000 },
+                    { name: "Wallet 7", value: 35000 },
+                    { name: "Wallet 8", value: 105000 },
+                    { name: "Wallet 9", value: 7500 },
+                    { name: "Wallet 10", value: 115000 },
+                    { name: "Wallet 11", value: 25000 },
+                    { name: "Wallet 12", value: 75000 },
+                    { name: "Wallet 13", value: 5000 },
+                    { name: "Wallet 14", value: 65000 },
+                    { name: "Wallet 15", value: 20000 },
+                    { name: "Wallet 16", value: 55000 },
+                    { name: "Wallet 17", value: 10000 },
+                    { name: "Wallet 18", value: 40000 },
+                    { name: "Wallet 19", value: 30000 },
+                    { name: "Wallet 20", value: 12500 }
                   ]}
                   xField="name"
                   yField="value"
