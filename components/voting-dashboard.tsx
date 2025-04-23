@@ -135,12 +135,18 @@ export default function VotingDashboard() {
     
     switch (period) {
       case "1D":
-        // 24 hourly points for 1 day
-        for (let i = 24; i >= 0; i--) {
-          const time = new Date(now.getTime() - (i * 60 * 60 * 1000))
+        // 12 two-hour intervals for 1 day
+        for (let i = 12; i >= 0; i--) {
+          const time = new Date(now.getTime() - (i * 2 * 60 * 60 * 1000))
           data.push({
-            time: time.toISOString().slice(0, 19).replace('T', ' '),
-            value: Math.floor(500000 + Math.random() * 1750000) // Random value between 500K and 2.25M
+            time: time.toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            }).replace(',', ''),
+            value: Math.floor(500000 + Math.random() * 1750000)
           })
         }
         break
@@ -150,18 +156,24 @@ export default function VotingDashboard() {
         for (let i = 7; i >= 0; i--) {
           const time = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000))
           data.push({
-            time: time.toISOString().slice(0, 19).replace('T', ' '),
+            time: time.toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric'
+            }),
             value: Math.floor(500000 + Math.random() * 1750000)
           })
         }
         break
         
       case "1M":
-        // 30 daily points
-        for (let i = 30; i >= 0; i--) {
-          const time = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000))
+        // 15 two-day intervals for 1 month
+        for (let i = 15; i >= 0; i--) {
+          const time = new Date(now.getTime() - (i * 2 * 24 * 60 * 60 * 1000))
           data.push({
-            time: time.toISOString().slice(0, 19).replace('T', ' '),
+            time: time.toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric'
+            }),
             value: Math.floor(500000 + Math.random() * 1750000)
           })
         }
@@ -172,15 +184,25 @@ export default function VotingDashboard() {
         for (let i = 12; i >= 0; i--) {
           const time = new Date(now.getTime() - (i * 30 * 24 * 60 * 60 * 1000))
           data.push({
-            time: time.toISOString().slice(0, 19).replace('T', ' '),
+            time: time.toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric'
+            }),
             value: Math.floor(500000 + Math.random() * 1750000)
           })
         }
         break
         
       case "All":
-        // Use all available historical data
-        return mockTimeSeriesData
+        // Format the existing mockTimeSeriesData dates
+        return mockTimeSeriesData.map(item => ({
+          time: new Date(item.time).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          }),
+          value: item.value
+        }))
     }
     
     return data
