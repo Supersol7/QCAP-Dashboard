@@ -1,4 +1,4 @@
-"use client"
+// Move the contents of components/allocation-dashboard.tsx here "use client"
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
