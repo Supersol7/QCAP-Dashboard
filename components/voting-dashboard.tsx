@@ -20,7 +20,7 @@ const mockQcapStaked = 1250000
 
 const mockTimeSeriesData = [
   { time: "2025/04/21 00:00", value: 500000 },
-  { time: "2025/04/22 60:00", value: 670000 },
+  { time: "2025/04/22 06:00", value: 670000 },
   { time: "2025/04/23 12:00", value: 935000 },
   { time: "2025/04/24 15:00", value: 1040000 },
   { time: "2025/04/25 20:00", value: 1245000 },
@@ -78,11 +78,9 @@ const mockProposals = [
 const mockHistoricalProposals = Array(20)
   .fill(null)
   .map((_, i) => {
-    // Random number of participating computers (between 100 and 676)
-    const participatingComputers = Math.floor(Math.random() * (676 - 100) + 100)
-    // Random number of votes in favor (between 0 and participating computers)
-    const votesFor = Math.floor(Math.random() * participatingComputers)
-    // Calculate if passed (more than 50% of participating voted in favor)
+    // Use deterministic values based on index instead of random
+    const participatingComputers = 100 + (i * 30) % 576 // Will cycle through values between 100 and 676
+    const votesFor = Math.floor(participatingComputers * 0.6) // Always 60% in favor
     const passed = votesFor > participatingComputers / 2
 
     return {
@@ -92,7 +90,7 @@ const mockHistoricalProposals = Array(20)
       participatingComputers,
       votesFor,
       votesAgainst: participatingComputers - votesFor,
-      totalComputers: 676 // Total available computers
+      totalComputers: 676
     }
   })
 
@@ -206,7 +204,8 @@ export default function VotingDashboard() {
   }, [statusFilter, historicalCount])
 
   const getTimeRangeData = (period: string) => {
-    const now = new Date()
+    // Use a fixed date for consistency between server and client
+    const now = new Date('2024-01-01T00:00:00Z')
     const data = []
     
     switch (period) {
@@ -215,14 +214,8 @@ export default function VotingDashboard() {
         for (let i = 12; i >= 0; i--) {
           const time = new Date(now.getTime() - (i * 2 * 60 * 60 * 1000))
           data.push({
-            time: time.toLocaleString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true
-            }).replace(',', ''),
-            value: Math.floor(500000 + Math.random() * 1750000)
+            time: time.toISOString().slice(0, 16).replace('T', ' '),
+            value: 500000 + (i * 100000)
           })
         }
         break
@@ -232,11 +225,8 @@ export default function VotingDashboard() {
         for (let i = 7; i >= 0; i--) {
           const time = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000))
           data.push({
-            time: time.toLocaleString('en-US', {
-              month: 'short',
-              day: 'numeric'
-            }),
-            value: Math.floor(500000 + Math.random() * 1750000)
+            time: time.toISOString().slice(0, 10),
+            value: 500000 + (i * 200000)
           })
         }
         break
@@ -246,11 +236,8 @@ export default function VotingDashboard() {
         for (let i = 15; i >= 0; i--) {
           const time = new Date(now.getTime() - (i * 2 * 24 * 60 * 60 * 1000))
           data.push({
-            time: time.toLocaleString('en-US', {
-              month: 'short',
-              day: 'numeric'
-            }),
-            value: Math.floor(500000 + Math.random() * 1750000)
+            time: time.toISOString().slice(0, 10),
+            value: 500000 + (i * 150000)
           })
         }
         break
@@ -260,25 +247,30 @@ export default function VotingDashboard() {
         for (let i = 12; i >= 0; i--) {
           const time = new Date(now.getTime() - (i * 30 * 24 * 60 * 60 * 1000))
           data.push({
-            time: time.toLocaleString('en-US', {
-              month: 'short',
-              day: 'numeric'
-            }),
-            value: Math.floor(500000 + Math.random() * 1750000)
+            time: time.toISOString().slice(0, 10),
+            value: 500000 + (i * 300000)
           })
         }
         break
         
       case "All":
         // Format the existing mockTimeSeriesData dates
-        return mockTimeSeriesData.map(item => ({
-          time: new Date(item.time).toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-          }),
-          value: item.value
-        }))
+        return mockTimeSeriesData.map(item => {
+          const [date, time] = item.time.split(' ')
+          const [year, month, day] = date.split('/')
+          const [hours, minutes] = time.split(':')
+          const formattedDate = new Date(
+            parseInt(year),
+            parseInt(month) - 1, // months are 0-indexed
+            parseInt(day),
+            parseInt(hours),
+            parseInt(minutes)
+          )
+          return {
+            time: formattedDate.toISOString().slice(0, 16).replace('T', ' '),
+            value: item.value
+          }
+        })
     }
     
     return data
@@ -520,7 +512,7 @@ export default function VotingDashboard() {
                       <Badge variant="outline">{proposal.type}</Badge>
                       <div className="flex items-center text-sm text-muted-foreground">
                         <Clock className="mr-1 h-4 w-4" />
-                        {proposal.timeRemaining}
+                        {proposal.timeRemaining} 
                       </div>
                     </div>
                   </div>
@@ -571,7 +563,7 @@ export default function VotingDashboard() {
           <CardTitle>Historical Proposals</CardTitle>
           <CardDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <span>Track of the last {historicalCount} proposals and their results</span>
-            <div className="flex gap-2">
+            <span className="flex gap-2">
               <Select
                 value={statusFilter}
                 onValueChange={(value: "all" | "passed" | "failed") => setStatusFilter(value)}
@@ -599,7 +591,7 @@ export default function VotingDashboard() {
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </span>
           </CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
