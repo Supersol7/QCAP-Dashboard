@@ -10,9 +10,7 @@ const mockQearnData = {
   qubicLocked: 500000,
   interestAccrued: 25000,
   upcomingLocks: [
-    { epoch: "Next", amount: 50000 },
-    { epoch: "Next+1", amount: 75000 },
-    { epoch: "Next+2", amount: 100000 },
+    { epoch: "epoch 157", amount: 1543000 }
   ],
   lockHistory: Array(20)
     .fill(null)
@@ -67,26 +65,14 @@ export default function QearnDashboard() {
 
       <Card className="lg:col-span-3">
         <CardHeader>
-          <CardTitle>Qubic to be Locked</CardTitle>
-          <CardDescription>Upcoming locks for future epochs</CardDescription>
+          <CardTitle>Next Epoch Lock</CardTitle>
+          <CardDescription>QU amount to be locked for next epoch - {mockQearnData.upcomingLocks[0].epoch}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Epoch</TableHead>
-                <TableHead>Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockQearnData.upcomingLocks.map((lock, index) => (
-                <TableRow key={index}>
-                  <TableCell>{lock.epoch}</TableCell>
-                  <TableCell>{lock.amount.toLocaleString()}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="flex flex-col items-center justify-center space-y-2">
+            <Lock className="h-12 w-12 text-primary" />
+            <div className="text-3xl font-bold">{mockQearnData.upcomingLocks[0].amount.toLocaleString()}</div>
+          </div>
         </CardContent>
       </Card>
 
