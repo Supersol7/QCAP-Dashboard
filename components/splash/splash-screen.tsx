@@ -9,6 +9,7 @@ export default function SplashScreen() {
   const router = useRouter()
   const [isAnimating, setIsAnimating] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [welcomeComplete, setWelcomeComplete] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const generateChartData = (length: number, volatility: number, baseValue = 50) => {
@@ -378,22 +379,37 @@ export default function SplashScreen() {
             <Image
               src="/logo.gif"
               alt="QCAP Logo"
-              width={120}
-              height={120}
+              width={190}
+              height={190}
               className="mb-6"
             />
-            <h1 className="text-6xl font-bold text-white mb-4 glow-text">QCAP</h1>
-            <p className="text-xl text-gray-300">Analytics Dashboard</p>
+            <h1 className="text-4xl font-bold text-white mb-4 glow-text">
+              {"Welcome to the Qubic Capital Analytics dashboard".split("").map((char, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: i * 0.05 }}
+                  onAnimationComplete={() => {
+                    if (i === "Welcome to the Qubic Capital Analytics dashboard".length - 1) {
+                      setWelcomeComplete(true)
+                    }
+                  }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </h1>
           </motion.div>
           <motion.p
             initial={{ y: 20, opacity: 0 }}
             animate={{ 
-              y: 0, 
-              opacity: 1,
-              color: ['#ff0000', '#ff8c00', '#ff0000']
+              y: welcomeComplete ? 0 : 20, 
+              opacity: welcomeComplete ? 1 : 0,
+              color: welcomeComplete ? ['#ff0000', '#ff8c00', '#ff0000'] : '#ff0000'
             }}
             transition={{ 
-              delay: 0.4,
+              delay: welcomeComplete ? 0.4 : 0,
               color: {
                 duration: 2,
                 repeat: Infinity,
