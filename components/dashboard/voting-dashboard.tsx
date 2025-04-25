@@ -654,7 +654,7 @@ export default function VotingDashboard() {
                     <TableCell className="font-mono">{proposal.id}</TableCell>
                     <TableCell>{proposal.title}</TableCell>
                     <TableCell>
-                      <Badge variant={proposal.status === "Passed" ? "default" : "destructive"}>
+                      <Badge variant={proposal.status === "Passed" ? "success" : "destructive"}>
                         {proposal.status}
                       </Badge>
                     </TableCell>
