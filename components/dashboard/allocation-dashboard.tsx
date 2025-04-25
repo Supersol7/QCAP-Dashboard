@@ -16,14 +16,24 @@ const mockAllocationData = {
 
 const mockBurnData = {
   total: 1250000,
-  last10: 25000,
-  last20: 45000,
-  last50: 95000,
-  last100: 175000,
+  epochData: Array(100).fill(null).map(() => Math.floor(Math.random() * 3000) + 1000)
 }
 
 export default function AllocationDashboard() {
-  const [timeframe, setTimeframe] = useState("100")
+  const [timeframe, setTimeframe] = useState("10")
+  const [chartTimeframe, setChartTimeframe] = useState("100")
+
+  // Calculate burn statistics based on timeframe
+  const getTimeframeData = (tf: string) => {
+    const epochs = parseInt(tf)
+    const recentData = mockBurnData.epochData.slice(-epochs)
+    return {
+      periodTotal: recentData.reduce((sum, val) => sum + val, 0),
+      average: Math.floor(recentData.reduce((sum, val) => sum + val, 0) / epochs)
+    }
+  }
+
+  const timeframeData = getTimeframeData(timeframe)
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -95,7 +105,7 @@ export default function AllocationDashboard() {
             <span>Total and for the last {timeframe} epochs</span>
             <Select defaultValue={timeframe} onValueChange={setTimeframe}>
               <SelectTrigger className="w-20">
-                <SelectValue placeholder="100" />
+                <SelectValue placeholder="10" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="10">10</SelectItem>
@@ -116,20 +126,14 @@ export default function AllocationDashboard() {
             <div className="space-y-2">
               <div className="text-sm font-medium">Last {timeframe} Epochs</div>
               <div className="text-2xl font-bold">
-                {timeframe === "10" && mockBurnData.last10.toLocaleString()}
-                {timeframe === "20" && mockBurnData.last20.toLocaleString()}
-                {timeframe === "50" && mockBurnData.last50.toLocaleString()}
-                {timeframe === "100" && mockBurnData.last100.toLocaleString()}
+                {timeframeData.periodTotal.toLocaleString()}
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="text-sm font-medium">Average per Epoch</div>
               <div className="text-xl font-bold">
-                {timeframe === "10" && (mockBurnData.last10 / 10).toLocaleString()}
-                {timeframe === "20" && (mockBurnData.last20 / 20).toLocaleString()}
-                {timeframe === "50" && (mockBurnData.last50 / 50).toLocaleString()}
-                {timeframe === "100" && (mockBurnData.last100 / 100).toLocaleString()}
+                {timeframeData.average.toLocaleString()}
               </div>
             </div>
           </div>
@@ -138,18 +142,31 @@ export default function AllocationDashboard() {
 
       <Card className="lg:col-span-3">
         <CardHeader>
-          <CardTitle>QCAP Burned Over Time</CardTitle>
-          <CardDescription>Historical data of QCAP burned per epoch</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>QCAP Burned Over Time</CardTitle>
+              <CardDescription>Historical data of QCAP burned per epoch</CardDescription>
+            </div>
+            <Select defaultValue={chartTimeframe} onValueChange={setChartTimeframe}>
+              <SelectTrigger className="w-20">
+                <SelectValue placeholder="100" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
             <LineChart
-              data={Array(100)
-                .fill(null)
-                .map((_, i) => ({
-                  epoch: i + 1,
-                  amount: Math.floor(Math.random() * 3000) + 1000,
-                }))}
+              data={mockBurnData.epochData.slice(-parseInt(chartTimeframe)).map((amount, i) => ({
+                epoch: i + 1,
+                amount,
+              }))}
               xField="epoch"
               yField="amount"
               categories={["amount"]}

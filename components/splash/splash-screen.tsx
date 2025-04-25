@@ -387,9 +387,20 @@ export default function SplashScreen() {
           </motion.div>
           <motion.p
             initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-sm text-gray-400"
+            animate={{ 
+              y: 0, 
+              opacity: 1,
+              color: ['#ff0000', '#ff8c00', '#ff0000']
+            }}
+            transition={{ 
+              delay: 0.4,
+              color: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+            className="text-sm tracking-wider"
           >
             Click anywhere to continue
           </motion.p>
