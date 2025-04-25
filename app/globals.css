@@ -3,33 +3,33 @@
 @tailwind utilities;
 
 :root {
-  --background: 270 70% 15%;
+  --background: 230 47% 11%;
   --foreground: 0 0% 100%;
 
-  --card: 270 70% 18%;
+  --card: 230 47% 13%;
   --card-foreground: 0 0% 100%;
 
-  --popover: 270 70% 18%;
+  --popover: 230 47% 13%;
   --popover-foreground: 0 0% 100%;
 
-  --primary: 285 100% 65%;
+  --primary: 217 100% 50%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 270 70% 25%;
+  --secondary: 230 47% 15%;
   --secondary-foreground: 0 0% 100%;
 
-  --muted: 270 70% 25%;
-  --muted-foreground: 215 20.2% 65.1%;
+  --muted: 230 47% 15%;
+  --muted-foreground: 215 20% 65%;
 
-  --accent: 270 70% 25%;
+  --accent: 217 100% 50%;
   --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 62.8% 30.6%;
+  --destructive: 0 63% 31%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 270 70% 30%;
-  --input: 270 70% 30%;
-  --ring: 285 100% 65%;
+  --border: 230 47% 20%;
+  --input: 230 47% 20%;
+  --ring: 217 100% 50%;
 
   --radius: 0.75rem;
 
@@ -49,33 +49,33 @@
 }
 
 .dark {
-  --background: 270 70% 15%;
+  --background: 230 47% 11%;
   --foreground: 0 0% 100%;
 
-  --card: 270 70% 18%;
+  --card: 230 47% 13%;
   --card-foreground: 0 0% 100%;
 
-  --popover: 270 70% 18%;
+  --popover: 230 47% 13%;
   --popover-foreground: 0 0% 100%;
 
-  --primary: 285 100% 65%;
+  --primary: 217 100% 50%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 270 70% 25%;
+  --secondary: 230 47% 15%;
   --secondary-foreground: 0 0% 100%;
 
-  --muted: 270 70% 25%;
-  --muted-foreground: 215 20.2% 65.1%;
+  --muted: 230 47% 15%;
+  --muted-foreground: 215 20% 65%;
 
-  --accent: 270 70% 25%;
+  --accent: 217 100% 50%;
   --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 62.8% 30.6%;
+  --destructive: 0 63% 31%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 270 70% 30%;
-  --input: 270 70% 30%;
-  --ring: 285 100% 65%;
+  --border: 230 47% 20%;
+  --input: 230 47% 20%;
+  --ring: 217 100% 50%;
 }
 
 @layer base {
@@ -85,7 +85,7 @@
   html,
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(135deg, #2d0a57 0%, #4b1a8a 100%);
+    background: linear-gradient(135deg, hsl(230, 47%, 11%) 0%, hsl(230, 47%, 15%) 100%);
     min-height: 100vh;
     height: 100%;
     margin: 0;
