@@ -80,7 +80,11 @@ const mockHistoricalProposals = Array(20)
   .map((_, i) => {
     // Use deterministic values based on index instead of random
     const participatingComputers = 100 + (i * 30) % 576 // Will cycle through values between 100 and 676
-    const votesFor = Math.floor(participatingComputers * 0.6) // Always 60% in favor
+    // Alternate between passed and failed proposals with varying vote distributions
+    const isPass = i % 3 !== 0 // Makes roughly 2/3 pass and 1/3 fail
+    const votesFor = isPass 
+      ? Math.floor(participatingComputers * (0.55 + (i % 3) * 0.1)) // 55-75% in favor for passing
+      : Math.floor(participatingComputers * (0.35 + (i % 2) * 0.1)) // 35-45% in favor for failing
     const passed = votesFor > participatingComputers / 2
 
     return {
@@ -163,9 +167,80 @@ export default function VotingDashboard() {
   const [statusFilter, setStatusFilter] = useState<"all" | "passed" | "failed">("all")
   const [votersPage, setVotersPage] = useState(1)
   const [copiedAddresses, setCopiedAddresses] = useState<Record<string, boolean>>({})
+  const [timeSeriesData, setTimeSeriesData] = useState(mockTimeSeriesData)
   const itemsPerPage = 5
   const votersPerPage = 5
   const [timePeriod, setTimePeriod] = useState("1D")
+
+  // Generate time-based data after initial render
+  useEffect(() => {
+    const getTimeRangeData = (period: string) => {
+      const now = new Date()
+      const data = []
+      
+      switch (period) {
+        case "1D":
+          // 12 two-hour intervals for 1 day
+          for (let i = 12; i >= 0; i--) {
+            const time = new Date(now.getTime() - (i * 2 * 60 * 60 * 1000))
+            const baseValue = 500000
+            const randomVariation = Math.floor(Math.random() * 200000)
+            data.push({
+              time: time.toISOString().slice(0, 16).replace('T', ' '),
+              value: baseValue + randomVariation
+            })
+          }
+          break
+          
+        case "7D":
+          // 7 daily points
+          for (let i = 7; i >= 0; i--) {
+            const time = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000))
+            const baseValue = 500000
+            const randomVariation = Math.floor(Math.random() * 300000)
+            data.push({
+              time: time.toISOString().slice(0, 10),
+              value: baseValue + randomVariation
+            })
+          }
+          break
+          
+        case "1M":
+          // 15 two-day intervals for 1 month
+          for (let i = 15; i >= 0; i--) {
+            const time = new Date(now.getTime() - (i * 2 * 24 * 60 * 60 * 1000))
+            const baseValue = 500000
+            const randomVariation = Math.floor(Math.random() * 400000)
+            data.push({
+              time: time.toISOString().slice(0, 10),
+              value: baseValue + randomVariation
+            })
+          }
+          break
+          
+        case "1Y":
+          // 12 monthly points
+          for (let i = 12; i >= 0; i--) {
+            const time = new Date(now.getTime() - (i * 30 * 24 * 60 * 60 * 1000))
+            const baseValue = 500000
+            const randomVariation = Math.floor(Math.random() * 500000)
+            data.push({
+              time: time.toISOString().slice(0, 10),
+              value: baseValue + randomVariation
+            })
+          }
+          break
+          
+        case "All":
+          return timeSeriesData
+      }
+      
+      return data
+    }
+
+    // Update time series data when time period changes
+    setTimeSeriesData(getTimeRangeData(timePeriod))
+  }, [timePeriod]) // Only re-run when timePeriod changes
 
   const handleCopyAddress = (address: string) => {
     navigator.clipboard.writeText(address)
@@ -203,79 +278,6 @@ export default function VotingDashboard() {
     setCurrentPage(1)
   }, [statusFilter, historicalCount])
 
-  const getTimeRangeData = (period: string) => {
-    // Use a fixed date for consistency between server and client
-    const now = new Date('2024-01-01T00:00:00Z')
-    const data = []
-    
-    switch (period) {
-      case "1D":
-        // 12 two-hour intervals for 1 day
-        for (let i = 12; i >= 0; i--) {
-          const time = new Date(now.getTime() - (i * 2 * 60 * 60 * 1000))
-          data.push({
-            time: time.toISOString().slice(0, 16).replace('T', ' '),
-            value: 500000 + (i * 100000)
-          })
-        }
-        break
-        
-      case "7D":
-        // 7 daily points
-        for (let i = 7; i >= 0; i--) {
-          const time = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000))
-          data.push({
-            time: time.toISOString().slice(0, 10),
-            value: 500000 + (i * 200000)
-          })
-        }
-        break
-        
-      case "1M":
-        // 15 two-day intervals for 1 month
-        for (let i = 15; i >= 0; i--) {
-          const time = new Date(now.getTime() - (i * 2 * 24 * 60 * 60 * 1000))
-          data.push({
-            time: time.toISOString().slice(0, 10),
-            value: 500000 + (i * 150000)
-          })
-        }
-        break
-        
-      case "1Y":
-        // 12 monthly points
-        for (let i = 12; i >= 0; i--) {
-          const time = new Date(now.getTime() - (i * 30 * 24 * 60 * 60 * 1000))
-          data.push({
-            time: time.toISOString().slice(0, 10),
-            value: 500000 + (i * 300000)
-          })
-        }
-        break
-        
-      case "All":
-        // Format the existing mockTimeSeriesData dates
-        return mockTimeSeriesData.map(item => {
-          const [date, time] = item.time.split(' ')
-          const [year, month, day] = date.split('/')
-          const [hours, minutes] = time.split(':')
-          const formattedDate = new Date(
-            parseInt(year),
-            parseInt(month) - 1, // months are 0-indexed
-            parseInt(day),
-            parseInt(hours),
-            parseInt(minutes)
-          )
-          return {
-            time: formattedDate.toISOString().slice(0, 16).replace('T', ' '),
-            value: item.value
-          }
-        })
-    }
-    
-    return data
-  }
-
   return (
     <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <Card className="col-span-1 md:col-span-2 lg:col-span-3">
@@ -309,7 +311,7 @@ export default function VotingDashboard() {
           <div className="mt-4 h-[200px] w-full overflow-x-auto">
             <div className="min-w-[500px] h-full">
               <LineChart
-                data={getTimeRangeData(timePeriod)}
+                data={timeSeriesData}
                 xField="time"
                 yField="value"
                 categories={["value"]}
@@ -452,7 +454,7 @@ export default function VotingDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="col-span-1">
+      {/* <Card className="col-span-1">
         <CardHeader>
           <CardTitle>Quorum Requirements</CardTitle>
           <CardDescription>Current quorum settings for proposals</CardDescription>
@@ -488,8 +490,48 @@ export default function VotingDashboard() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
+      <Card className="col-span-1">
+        <CardHeader>
+          <CardTitle>Proposal Fees</CardTitle>
+          <CardDescription>Fees and time for each type of proposal</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Type</TableHead>
+                <TableHead>Fee (QCAP)</TableHead>
+                <TableHead>Duration</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>Parameter Change</TableCell>
+                <TableCell>100</TableCell>
+                <TableCell>3 days</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Asset Addition</TableCell>
+                <TableCell>200</TableCell>
+                <TableCell>5 days</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Governance</TableCell>
+                <TableCell>150</TableCell>
+                <TableCell>7 days</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Emergency</TableCell>
+                <TableCell>300</TableCell>
+                <TableCell>1 day</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      
       <Card className="col-span-1 md:col-span-2 lg:col-span-3">
         <CardHeader>
           <CardTitle>Active Proposals</CardTitle>
@@ -558,7 +600,7 @@ export default function VotingDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="col-span-1 md:col-span-2">
+      <Card className="col-span-1 md:col-span-2 lg:col-span-3">
         <CardHeader>
           <CardTitle>Historical Proposals</CardTitle>
           <CardDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -713,45 +755,7 @@ export default function VotingDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="col-span-1">
-        <CardHeader>
-          <CardTitle>Proposal Fees</CardTitle>
-          <CardDescription>Fees and time for each type of proposal</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Fee (QCAP)</TableHead>
-                <TableHead>Duration</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>Parameter Change</TableCell>
-                <TableCell>100</TableCell>
-                <TableCell>3 days</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Asset Addition</TableCell>
-                <TableCell>200</TableCell>
-                <TableCell>5 days</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Governance</TableCell>
-                <TableCell>150</TableCell>
-                <TableCell>7 days</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Emergency</TableCell>
-                <TableCell>300</TableCell>
-                <TableCell>1 day</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      
 
       <Card className="col-span-1 md:col-span-2 lg:col-span-3">
         <CardHeader>
@@ -760,7 +764,6 @@ export default function VotingDashboard() {
         </CardHeader>
         <CardContent className="overflow-x-auto">          
           <div className="mt-6 min-w-[900px]">
-            <h3 className="text-lg font-medium mb-4">Detailed Wallet Information</h3>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -768,8 +771,8 @@ export default function VotingDashboard() {
                   <TableHead>Staked Amount</TableHead>
                   <TableHead>Voting Power</TableHead>
                   <TableHead>Last Vote</TableHead>
-                  <TableHead>Proposals Voted</TableHead>
-                  <TableHead>Proposals Created</TableHead>
+                  <TableHead className="text-center">Proposals Voted</TableHead>
+                  <TableHead className="text-center">Proposals Created</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -813,8 +816,8 @@ export default function VotingDashboard() {
                       </div>
                     </TableCell>
                     <TableCell>{wallet.lastVote}</TableCell>
-                    <TableCell>{wallet.proposalsVoted}</TableCell>
-                    <TableCell>{wallet.proposalsCreated}</TableCell>
+                    <TableCell className="text-center">{wallet.proposalsVoted}</TableCell>
+                    <TableCell className="text-center">{wallet.proposalsCreated}</TableCell>
                     <TableCell>
                       <Badge variant={wallet.status === "active" ? "default" : "outline"}>
                         {wallet.status}

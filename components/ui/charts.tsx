@@ -86,10 +86,10 @@ interface PieChartProps {
 
 export function PieChart({ data, nameKey, dataKey }: PieChartProps) {
   const COLORS = [
-    "hsl(var(--primary))",
-    "hsl(var(--primary) / 0.8)",
-    "hsl(var(--primary) / 0.6)",
-    "hsl(var(--primary) / 0.4)",
+    "#FF7B5B",  // Coral/orange
+    "#4169E1",  // Light blue
+    "#6A5ACD",  // Purple/indigo
+    "#40E0D0",  // Turquoise
   ]
 
   return (
