@@ -122,14 +122,14 @@ export default function GeneralDataDashboard() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <Card>
+      <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle>Circulating Supply</CardTitle>
+          <CardTitle className="text-3xl font-bold">Circulating Supply</CardTitle>
           <CardDescription>Total QCAP currently in circulation</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{mockCirculatingSupply.toLocaleString()}</div>
-          <div className="mt-4 h-[200px]">
+        <CardContent className="flex-1 flex flex-col">
+          <div className="text-2xl font-bold mb-4">{mockCirculatingSupply.toLocaleString()}</div>
+          <div className="h-[300px]">
             <LineChart
               data={Array(100)
                 .fill(null)
@@ -145,28 +145,28 @@ export default function GeneralDataDashboard() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle>QCAP Available to Sell</CardTitle>
+          <CardTitle className="text-3xl font-bold">QCAP Available to Sell</CardTitle>
           <CardDescription>Amount available per year (changes based on sold QCAP)</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="h-[200px]">
+        <CardContent className="flex-1 flex flex-col justify-end">
+          <div className="h-[300px]">
             <BarChart data={mockQcapAvailableToSell} xField="year" yField="amount" categories={["amount"]} />
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle>Revenue Overview</CardTitle>
+          <CardTitle className="text-3xl font-bold">Revenue Overview</CardTitle>
           <CardDescription>Total and recent revenue metrics</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 flex flex-col">
           <div className="space-y-4">
             <div>
               <div className="text-sm font-medium">Total Revenue</div>
-              <div className="text-3xl font-bold">{mockRevenueData.totalRevenue.toLocaleString()} Qu</div>
+              <div className="text-2xl font-bold">{mockRevenueData.totalRevenue.toLocaleString()} Qu</div>
             </div>
             <div>
               <div className="text-sm font-medium">Last Epoch Revenue</div>
@@ -190,9 +190,9 @@ export default function GeneralDataDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-3">
+      <Card className="lg:col-span-3 flex flex-col">
         <CardHeader>
-          <CardTitle>Revenue Per Epoch</CardTitle>
+          <CardTitle className="text-3xl font-bold">QCAP Revenue per Epoch</CardTitle>
           <CardDescription className="flex items-center justify-between">
             <span>Revenue earned for the last {revenueTimeframe} epochs</span>
             <Select defaultValue={revenueTimeframe} onValueChange={setRevenueTimeframe}>
@@ -208,10 +208,10 @@ export default function GeneralDataDashboard() {
             </Select>
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
+        <CardContent className="flex-1 flex flex-col">
+          <div className="h-[300px] mt-auto">
             <LineChart
-              data={mockRevenueData.revenueByEpoch.slice(0, Number.parseInt(revenueTimeframe))}
+              data={mockRevenueData.revenueByEpoch.slice(-Number.parseInt(revenueTimeframe))}
               xField="epoch"
               yField="revenue"
               categories={["revenue"]}
@@ -220,9 +220,9 @@ export default function GeneralDataDashboard() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-3">
+      <Card className="lg:col-span-3 flex flex-col">
         <CardHeader>
-          <CardTitle>Qu Distribution</CardTitle>
+          <CardTitle className="text-3xl font-bold">Qu Distribution</CardTitle>
           <CardDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <span className="text-sm">Qu distributed for the last {distributionTimeframe} epochs</span>
             <div className="flex flex-col xs:flex-row w-full sm:w-auto items-stretch sm:items-center gap-2">
@@ -250,18 +250,15 @@ export default function GeneralDataDashboard() {
             </div>
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 flex flex-col">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <Card 
-              className={`${selectedMetric === "distributed" ? "ring-2 ring-primary" : ""} hover:bg-accent/50 cursor-pointer transition-colors`}
-              onClick={() => setSelectedMetric("distributed")}
-            >
+            <Card>
               <CardContent className="p-4 sm:p-6 h-full">
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <Share2 className="h-8 w-8 text-primary mb-2" />
                   <div className="space-y-1">
-                    <div className="text-sm font-medium">Total Distributed</div>
-                    <div className="text-2xl font-bold">
+                    <div className="text-xl font-medium">Total Distributed</div>
+                    <div className="text-lg font-bold">
                       {mockQuData.distributedByEpoch
                         .slice(-Number.parseInt(distributionTimeframe))
                         .reduce((sum, item) => sum + item.distributed, 0)
@@ -272,16 +269,13 @@ export default function GeneralDataDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card 
-              className={`${selectedMetric === "reinvested" ? "ring-2 ring-primary" : ""} hover:bg-accent/50 cursor-pointer transition-colors`}
-              onClick={() => setSelectedMetric("reinvested")}
-            >
+            <Card>
               <CardContent className="p-4 sm:p-6 h-full">
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <Recycle className="h-8 w-8 text-primary mb-2" />
                   <div className="space-y-1">
-                    <div className="text-sm font-medium">Total Reinvested</div>
-                    <div className="text-2xl font-bold">
+                    <div className="text-xl font-medium">Total Reinvested</div>
+                    <div className="text-lg font-bold">
                       {mockQuData.reinvestedByEpoch
                         .slice(-Number.parseInt(distributionTimeframe))
                         .reduce((sum, item) => sum + item.reinvested, 0)
@@ -292,16 +286,13 @@ export default function GeneralDataDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card 
-              className={`${selectedMetric === "qvault" ? "ring-2 ring-primary" : ""} hover:bg-accent/50 cursor-pointer transition-colors sm:col-span-2 lg:col-span-1`}
-              onClick={() => setSelectedMetric("qvault")}
-            >
+            <Card className="sm:col-span-2 lg:col-span-1">
               <CardContent className="p-4 sm:p-6 h-full">
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <Users className="h-8 w-8 text-primary mb-2" />
                   <div className="space-y-1">
-                    <div className="text-sm font-medium">To QVAULT Shareholders</div>
-                    <div className="text-2xl font-bold">
+                    <div className="text-xl font-medium">To QVAULT Shareholders</div>
+                    <div className="text-lg font-bold">
                       {Math.round(
                         mockQuData.distributedByEpoch
                           .slice(-Number.parseInt(distributionTimeframe))
@@ -314,7 +305,7 @@ export default function GeneralDataDashboard() {
               </CardContent>
             </Card>
           </div>
-          <div className="h-[300px] sm:h-[400px]">
+          <div className="h-[300px] mt-auto">
             <LineChart
               data={getChartData(selectedMetric, distributionTimeframe)}
               xField="epoch"
