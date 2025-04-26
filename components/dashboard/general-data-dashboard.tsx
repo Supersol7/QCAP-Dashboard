@@ -115,7 +115,7 @@ export default function GeneralDataDashboard() {
       case "qvault":
         return mockQuData.distributedByEpoch.slice(-n).map(item => ({
           epoch: item.epoch,
-          distributed: Math.round(item.distributed * 0.2) // 20% to QVAULT
+          distributed: Math.round(item.distributed * 0.2)
         }))
     }
   }
@@ -135,7 +135,7 @@ export default function GeneralDataDashboard() {
                 .fill(null)
                 .map((_, i) => ({
                   epoch: i + 1,
-                  supply: 8000000 + i * 20000,
+                  supply: 3000000 + i * 20000,
                 }))}
               xField="epoch"
               yField="supply"
