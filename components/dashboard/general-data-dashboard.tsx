@@ -21,10 +21,10 @@ const mockRevenueData = {
   totalRevenue: 5000000,
   lastEpochRevenue: 75000,
   revenueByAsset: [
-    { asset: "BTC", revenue: 2000000 },
-    { asset: "ETH", revenue: 1500000 },
-    { asset: "SOL", revenue: 1000000 },
-    { asset: "AVAX", revenue: 500000 },
+    { asset: "QVault", revenue: 2000000 },
+    { asset: "QX", revenue: 1500000 },
+    { asset: "QTRY", revenue: 1000000 },
+    { asset: "QUtil", revenue: 500000 },
   ],
   revenueByEpoch: Array(100)
     .fill(null)
@@ -100,7 +100,9 @@ const mockMarketData = {
 }
 
 export default function GeneralDataDashboard() {
-  const [timeframe, setTimeframe] = useState("100")
+  const [revenueTimeframe, setRevenueTimeframe] = useState("100")
+  const [distributionTimeframe, setDistributionTimeframe] = useState("100")
+  const [reinvestedTimeframe, setReinvestedTimeframe] = useState("100")
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -176,8 +178,8 @@ export default function GeneralDataDashboard() {
         <CardHeader>
           <CardTitle>Revenue Per Epoch</CardTitle>
           <CardDescription className="flex items-center justify-between">
-            <span>Revenue earned for the last {timeframe} epochs</span>
-            <Select defaultValue={timeframe} onValueChange={setTimeframe}>
+            <span>Revenue earned for the last {revenueTimeframe} epochs</span>
+            <Select defaultValue={revenueTimeframe} onValueChange={setRevenueTimeframe}>
               <SelectTrigger className="w-20">
                 <SelectValue placeholder="100" />
               </SelectTrigger>
@@ -193,7 +195,7 @@ export default function GeneralDataDashboard() {
         <CardContent>
           <div className="h-[300px]">
             <LineChart
-              data={mockRevenueData.revenueByEpoch.slice(0, Number.parseInt(timeframe))}
+              data={mockRevenueData.revenueByEpoch.slice(0, Number.parseInt(revenueTimeframe))}
               xField="epoch"
               yField="revenue"
               categories={["revenue"]}
@@ -206,8 +208,8 @@ export default function GeneralDataDashboard() {
         <CardHeader>
           <CardTitle>Qu Distribution</CardTitle>
           <CardDescription className="flex items-center justify-between">
-            <span>Qu distributed for the last {timeframe} epochs</span>
-            <Select defaultValue={timeframe} onValueChange={setTimeframe}>
+            <span>Qu distributed for the last {distributionTimeframe} epochs</span>
+            <Select defaultValue={distributionTimeframe} onValueChange={setDistributionTimeframe}>
               <SelectTrigger className="w-20">
                 <SelectValue placeholder="100" />
               </SelectTrigger>
@@ -227,7 +229,13 @@ export default function GeneralDataDashboard() {
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <Share2 className="h-8 w-8 text-primary" />
                   <div className="text-sm font-medium">Total Distributed</div>
-                  <div className="text-2xl font-bold">{mockQuData.totalDistributed.toLocaleString()} Qu</div>
+                  <div className="text-2xl font-bold">
+                    {mockQuData.distributedByEpoch
+                      .slice(-Number.parseInt(distributionTimeframe))
+                      .reduce((sum, item) => sum + item.distributed, 0)
+                      .toLocaleString()}{" "}
+                    Qu
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -236,7 +244,13 @@ export default function GeneralDataDashboard() {
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <Recycle className="h-8 w-8 text-primary" />
                   <div className="text-sm font-medium">Total Reinvested</div>
-                  <div className="text-2xl font-bold">{mockQuData.totalReinvested.toLocaleString()} Qu</div>
+                  <div className="text-2xl font-bold">
+                    {mockQuData.reinvestedByEpoch
+                      .slice(-Number.parseInt(distributionTimeframe))
+                      .reduce((sum, item) => sum + item.reinvested, 0)
+                      .toLocaleString()}{" "}
+                    Qu
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -245,14 +259,21 @@ export default function GeneralDataDashboard() {
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <Users className="h-8 w-8 text-primary" />
                   <div className="text-sm font-medium">To QVAULT Shareholders</div>
-                  <div className="text-2xl font-bold">{mockQuData.distributedToQvault.toLocaleString()} Qu</div>
+                  <div className="text-2xl font-bold">
+                    {Math.round(
+                      mockQuData.distributedByEpoch
+                        .slice(-Number.parseInt(distributionTimeframe))
+                        .reduce((sum, item) => sum + item.distributed, 0) * 0.2
+                    ).toLocaleString()}{" "}
+                    Qu
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
           <div className="h-[300px]">
             <LineChart
-              data={mockQuData.distributedByEpoch.slice(0, Number.parseInt(timeframe))}
+              data={mockQuData.distributedByEpoch.slice(-Number.parseInt(distributionTimeframe))}
               xField="epoch"
               yField="distributed"
               categories={["distributed"]}
@@ -265,8 +286,8 @@ export default function GeneralDataDashboard() {
         <CardHeader>
           <CardTitle>Qu Reinvested</CardTitle>
           <CardDescription className="flex items-center justify-between">
-            <span>Qu reinvested for the last {timeframe} epochs</span>
-            <Select defaultValue={timeframe} onValueChange={setTimeframe}>
+            <span>Qu reinvested for the last {reinvestedTimeframe} epochs</span>
+            <Select defaultValue={reinvestedTimeframe} onValueChange={setReinvestedTimeframe}>
               <SelectTrigger className="w-20">
                 <SelectValue placeholder="100" />
               </SelectTrigger>
@@ -282,7 +303,7 @@ export default function GeneralDataDashboard() {
         <CardContent>
           <div className="h-[300px]">
             <LineChart
-              data={mockQuData.reinvestedByEpoch.slice(0, Number.parseInt(timeframe))}
+              data={mockQuData.reinvestedByEpoch.slice(0, Number.parseInt(reinvestedTimeframe))}
               xField="epoch"
               yField="reinvested"
               categories={["reinvested"]}
