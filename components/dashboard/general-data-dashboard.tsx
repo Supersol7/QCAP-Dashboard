@@ -103,6 +103,22 @@ export default function GeneralDataDashboard() {
   const [revenueTimeframe, setRevenueTimeframe] = useState("100")
   const [distributionTimeframe, setDistributionTimeframe] = useState("100")
   const [reinvestedTimeframe, setReinvestedTimeframe] = useState("100")
+  const [selectedMetric, setSelectedMetric] = useState<"distributed" | "reinvested" | "qvault">("distributed")
+
+  const getChartData = (metric: typeof selectedMetric, timeframe: string) => {
+    const n = Number.parseInt(timeframe)
+    switch (metric) {
+      case "distributed":
+        return mockQuData.distributedByEpoch.slice(-n)
+      case "reinvested":
+        return mockQuData.reinvestedByEpoch.slice(-n)
+      case "qvault":
+        return mockQuData.distributedByEpoch.slice(-n).map(item => ({
+          epoch: item.epoch,
+          distributed: Math.round(item.distributed * 0.2) // 20% to QVAULT
+        }))
+    }
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -209,22 +225,34 @@ export default function GeneralDataDashboard() {
           <CardTitle>Qu Distribution</CardTitle>
           <CardDescription className="flex items-center justify-between">
             <span>Qu distributed for the last {distributionTimeframe} epochs</span>
-            <Select defaultValue={distributionTimeframe} onValueChange={setDistributionTimeframe}>
-              <SelectTrigger className="w-20">
-                <SelectValue placeholder="100" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-2">
+              <Select defaultValue={selectedMetric} onValueChange={(value: typeof selectedMetric) => setSelectedMetric(value)}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select metric" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="distributed">Total Distributed</SelectItem>
+                  <SelectItem value="reinvested">Total Reinvested</SelectItem>
+                  <SelectItem value="qvault">To QVAULT Shareholders</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select defaultValue={distributionTimeframe} onValueChange={setDistributionTimeframe}>
+                <SelectTrigger className="w-20">
+                  <SelectValue placeholder="100" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Card>
+            <Card className={selectedMetric === "distributed" ? "ring-2 ring-primary" : ""}>
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <Share2 className="h-8 w-8 text-primary" />
@@ -239,7 +267,7 @@ export default function GeneralDataDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={selectedMetric === "reinvested" ? "ring-2 ring-primary" : ""}>
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <Recycle className="h-8 w-8 text-primary" />
@@ -254,7 +282,7 @@ export default function GeneralDataDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={selectedMetric === "qvault" ? "ring-2 ring-primary" : ""}>
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <Users className="h-8 w-8 text-primary" />
@@ -273,40 +301,10 @@ export default function GeneralDataDashboard() {
           </div>
           <div className="h-[300px]">
             <LineChart
-              data={mockQuData.distributedByEpoch.slice(-Number.parseInt(distributionTimeframe))}
+              data={getChartData(selectedMetric, distributionTimeframe)}
               xField="epoch"
-              yField="distributed"
-              categories={["distributed"]}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="lg:col-span-3">
-        <CardHeader>
-          <CardTitle>Qu Reinvested</CardTitle>
-          <CardDescription className="flex items-center justify-between">
-            <span>Qu reinvested for the last {reinvestedTimeframe} epochs</span>
-            <Select defaultValue={reinvestedTimeframe} onValueChange={setReinvestedTimeframe}>
-              <SelectTrigger className="w-20">
-                <SelectValue placeholder="100" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            <LineChart
-              data={mockQuData.reinvestedByEpoch.slice(0, Number.parseInt(reinvestedTimeframe))}
-              xField="epoch"
-              yField="reinvested"
-              categories={["reinvested"]}
+              yField={selectedMetric === "qvault" ? "distributed" : selectedMetric}
+              categories={[selectedMetric === "qvault" ? "distributed" : selectedMetric]}
             />
           </div>
         </CardContent>
