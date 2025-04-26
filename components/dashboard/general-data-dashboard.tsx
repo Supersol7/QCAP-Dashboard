@@ -389,7 +389,7 @@ export default function GeneralDataDashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Holders</CardTitle>
+          <CardTitle className="text-3xl font-bold">Holders</CardTitle>
           <CardDescription>QCAP holder statistics</CardDescription>
         </CardHeader>
         <CardContent>
@@ -406,9 +406,49 @@ export default function GeneralDataDashboard() {
         </CardContent>
       </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl font-bold">SC Rich List Positions</CardTitle>
+            <CardDescription>Position that QCAP has in the rich lists of the SCs we hold</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>SC</TableHead>
+                  <TableHead>Position</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mockMarketData.scPositions.map((item) => (
+                  <TableRow key={item.sc}>
+                    <TableCell>{item.sc}</TableCell>
+                    <TableCell>#{item.position}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl font-bold">Restricted Revenue</CardTitle>
+            <CardDescription>Revenue with restrictions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium">Muslim Restricted</p>
+                <p className="text-2xl font-bold">{mockMarketData.restrictedRevenue.muslim.toLocaleString()} Qu</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
       <Card className="lg:col-span-3">
         <CardHeader>
-          <CardTitle>QCAP Rich List</CardTitle>
+          <CardTitle className="text-3xl font-bold">QCAP Rich List</CardTitle>
           <CardDescription>Top QCAP holders</CardDescription>
         </CardHeader>
         <CardContent>
@@ -430,46 +470,6 @@ export default function GeneralDataDashboard() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle>SC Rich List Positions</CardTitle>
-          <CardDescription>Position that QCAP has in the rich lists of the SCs we hold</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>SC</TableHead>
-                <TableHead>Position</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockMarketData.scPositions.map((item) => (
-                <TableRow key={item.sc}>
-                  <TableCell>{item.sc}</TableCell>
-                  <TableCell>#{item.position}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Restricted Revenue</CardTitle>
-          <CardDescription>Revenue with restrictions</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm font-medium">Muslim Restricted</p>
-              <p className="text-2xl font-bold">{mockMarketData.restrictedRevenue.muslim.toLocaleString()} Qu</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
