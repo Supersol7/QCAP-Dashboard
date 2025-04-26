@@ -223,21 +223,21 @@ export default function GeneralDataDashboard() {
       <Card className="lg:col-span-3">
         <CardHeader>
           <CardTitle>Qu Distribution</CardTitle>
-          <CardDescription className="flex items-center justify-between">
-            <span>Qu distributed for the last {distributionTimeframe} epochs</span>
-            <div className="flex items-center gap-2">
+          <CardDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <span className="text-sm">Qu distributed for the last {distributionTimeframe} epochs</span>
+            <div className="flex flex-col xs:flex-row w-full sm:w-auto items-stretch sm:items-center gap-2">
               <Select defaultValue={selectedMetric} onValueChange={(value: typeof selectedMetric) => setSelectedMetric(value)}>
-                <SelectTrigger className="w-[200px]">
+                <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue placeholder="Select metric" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="distributed">Total Distributed</SelectItem>
-                  <SelectItem value="reinvested">Total Reinvested</SelectItem>
-                  <SelectItem value="qvault">To QVAULT Shareholders</SelectItem>
+                  <SelectItem value="distributed">Distributed</SelectItem>
+                  <SelectItem value="reinvested">Reinvested</SelectItem>
+                  <SelectItem value="qvault">Distributed To QVAULT Shareholders</SelectItem>
                 </SelectContent>
               </Select>
               <Select defaultValue={distributionTimeframe} onValueChange={setDistributionTimeframe}>
-                <SelectTrigger className="w-20">
+                <SelectTrigger className="w-full xs:w-24">
                   <SelectValue placeholder="100" />
                 </SelectTrigger>
                 <SelectContent>
@@ -251,55 +251,70 @@ export default function GeneralDataDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Card className={selectedMetric === "distributed" ? "ring-2 ring-primary" : ""}>
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center justify-center space-y-2">
-                  <Share2 className="h-8 w-8 text-primary" />
-                  <div className="text-sm font-medium">Total Distributed</div>
-                  <div className="text-2xl font-bold">
-                    {mockQuData.distributedByEpoch
-                      .slice(-Number.parseInt(distributionTimeframe))
-                      .reduce((sum, item) => sum + item.distributed, 0)
-                      .toLocaleString()}{" "}
-                    Qu
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className={selectedMetric === "reinvested" ? "ring-2 ring-primary" : ""}>
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center justify-center space-y-2">
-                  <Recycle className="h-8 w-8 text-primary" />
-                  <div className="text-sm font-medium">Total Reinvested</div>
-                  <div className="text-2xl font-bold">
-                    {mockQuData.reinvestedByEpoch
-                      .slice(-Number.parseInt(distributionTimeframe))
-                      .reduce((sum, item) => sum + item.reinvested, 0)
-                      .toLocaleString()}{" "}
-                    Qu
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className={selectedMetric === "qvault" ? "ring-2 ring-primary" : ""}>
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center justify-center space-y-2">
-                  <Users className="h-8 w-8 text-primary" />
-                  <div className="text-sm font-medium">To QVAULT Shareholders</div>
-                  <div className="text-2xl font-bold">
-                    {Math.round(
-                      mockQuData.distributedByEpoch
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <Card 
+              className={`${selectedMetric === "distributed" ? "ring-2 ring-primary" : ""} hover:bg-accent/50 cursor-pointer transition-colors`}
+              onClick={() => setSelectedMetric("distributed")}
+            >
+              <CardContent className="p-4 sm:p-6 h-full">
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <Share2 className="h-8 w-8 text-primary mb-2" />
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">Total Distributed</div>
+                    <div className="text-2xl font-bold">
+                      {mockQuData.distributedByEpoch
                         .slice(-Number.parseInt(distributionTimeframe))
-                        .reduce((sum, item) => sum + item.distributed, 0) * 0.2
-                    ).toLocaleString()}{" "}
-                    Qu
+                        .reduce((sum, item) => sum + item.distributed, 0)
+                        .toLocaleString()}{" "}
+                      Qu
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card 
+              className={`${selectedMetric === "reinvested" ? "ring-2 ring-primary" : ""} hover:bg-accent/50 cursor-pointer transition-colors`}
+              onClick={() => setSelectedMetric("reinvested")}
+            >
+              <CardContent className="p-4 sm:p-6 h-full">
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <Recycle className="h-8 w-8 text-primary mb-2" />
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">Total Reinvested</div>
+                    <div className="text-2xl font-bold">
+                      {mockQuData.reinvestedByEpoch
+                        .slice(-Number.parseInt(distributionTimeframe))
+                        .reduce((sum, item) => sum + item.reinvested, 0)
+                        .toLocaleString()}{" "}
+                      Qu
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card 
+              className={`${selectedMetric === "qvault" ? "ring-2 ring-primary" : ""} hover:bg-accent/50 cursor-pointer transition-colors sm:col-span-2 lg:col-span-1`}
+              onClick={() => setSelectedMetric("qvault")}
+            >
+              <CardContent className="p-4 sm:p-6 h-full">
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <Users className="h-8 w-8 text-primary mb-2" />
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">To QVAULT Shareholders</div>
+                    <div className="text-2xl font-bold">
+                      {Math.round(
+                        mockQuData.distributedByEpoch
+                          .slice(-Number.parseInt(distributionTimeframe))
+                          .reduce((sum, item) => sum + item.distributed, 0) * 0.2
+                      ).toLocaleString()}{" "}
+                      Qu
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-          <div className="h-[300px]">
+          <div className="h-[300px] sm:h-[400px]">
             <LineChart
               data={getChartData(selectedMetric, distributionTimeframe)}
               xField="epoch"
