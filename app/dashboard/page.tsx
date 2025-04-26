@@ -71,17 +71,16 @@ export default function DashboardPage() {
       </header>
       <main className="flex-1 container py-6">
         <Tabs defaultValue="voting" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 p-1 bg-secondary">
-            <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-white">
-              General Data
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 p-1 bg-secondary">            
             <TabsTrigger value="voting" className="data-[state=active]:bg-primary data-[state=active]:text-white">
               Voting System
             </TabsTrigger>
             <TabsTrigger value="allocation" className="data-[state=active]:bg-primary data-[state=active]:text-white">
               Allocation
             </TabsTrigger>
-            
+            <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              General Data
+            </TabsTrigger>
             <TabsTrigger value="qearn" className="data-[state=active]:bg-primary data-[state=active]:text-white">
               Qearn
             </TabsTrigger>

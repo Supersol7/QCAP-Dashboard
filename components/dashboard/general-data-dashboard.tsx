@@ -74,11 +74,11 @@ const mockMarketData = {
   holders: 2500,
   avgQcapPerHolder: 4000,
   richList: [
-    { address: "0x1a2b...3c4d", qcap: 125000, percentage: 1.25 },
-    { address: "0x5e6f...7g8h", qcap: 87500, percentage: 0.88 },
-    { address: "0x9i0j...1k2l", qcap: 62500, percentage: 0.63 },
-    { address: "0x3m4n...5o6p", qcap: 50000, percentage: 0.5 },
-    { address: "0x7q8r...9s0t", qcap: 37500, percentage: 0.38 },
+    { address: "GVWPFG...CHCNJ", qcap: 125000, percentage: 1.25 },
+    { address: "FREFAF...ADFDS", qcap: 87500, percentage: 0.88 },
+    { address: "GVWYER...YJTYJ", qcap: 62500, percentage: 0.63 },
+    { address: "MSDFGS...RTESG", qcap: 50000, percentage: 0.5 },
+    { address: "REGRGS...JMFDD", qcap: 37500, percentage: 0.38 },
   ],
   scPositions: [
     { sc: "SC1", position: 1 },
@@ -88,13 +88,13 @@ const mockMarketData = {
     { sc: "SC5", position: 10 },
   ],
   restrictedRevenue: {
-    muslim: 250000,
+    muslim: 25000,
   },
   priceData: {
-    primary: 2.0,
+    primary: 20000000,
     secondary: {
-      bid: 1.95,
-      ask: 2.05,
+      bid: 195000,
+      ask: 205000,
     },
   },
 }
@@ -223,32 +223,32 @@ export default function GeneralDataDashboard() {
       <Card className="lg:col-span-3 flex flex-col">
         <CardHeader>
           <CardTitle className="text-3xl font-bold">Qu Distribution</CardTitle>
-          <CardDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <CardDescription>
             <span className="text-sm">Qu distributed for the last {distributionTimeframe} epochs</span>
-            <div className="flex flex-col xs:flex-row w-full sm:w-auto items-stretch sm:items-center gap-2">
-              <Select defaultValue={selectedMetric} onValueChange={(value: typeof selectedMetric) => setSelectedMetric(value)}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Select metric" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="distributed">Distributed</SelectItem>
-                  <SelectItem value="reinvested">Reinvested</SelectItem>
-                  <SelectItem value="qvault">Distributed To QVAULT Shareholders</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select defaultValue={distributionTimeframe} onValueChange={setDistributionTimeframe}>
-                <SelectTrigger className="w-full xs:w-24">
-                  <SelectValue placeholder="100" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </CardDescription>
+          <div className="flex flex-col sm:flex-row w-full sm:justify-end items-stretch sm:items-center gap-2 mt-2">
+            <Select defaultValue={selectedMetric} onValueChange={(value: typeof selectedMetric) => setSelectedMetric(value)}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Select metric" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="distributed">Distributed</SelectItem>
+                <SelectItem value="reinvested">Reinvested</SelectItem>
+                <SelectItem value="qvault">Distributed To QVAULT Shareholders</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select defaultValue={distributionTimeframe} onValueChange={setDistributionTimeframe}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="100" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -321,8 +321,8 @@ export default function GeneralDataDashboard() {
           <CardTitle>Shares per SC</CardTitle>
           <CardDescription>Number of shares from each SC we hold</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="h-[200px]">
+        <CardContent className="flex flex-col h-[350px]">
+          <div className="flex-1 flex items-end">
             <BarChart data={mockSharesData} xField="sc" yField="shares" categories={["shares"]} />
           </div>
         </CardContent>
@@ -330,8 +330,14 @@ export default function GeneralDataDashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>QCAP Market Cap</CardTitle>
+          <CardTitle className="text-2xl font-bold">QCAP Market Cap</CardTitle>
           <CardDescription>Current market metrics</CardDescription>
+          <div className="flex justify-center mb-2">          
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-8">
+              <rect x="4" y="4" width="8" height="24" rx="2" fill="white"/>
+              <rect x="16" y="2" width="8" height="28" rx="2" fill="white"/>
+            </svg>
+          </div>          
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -439,8 +445,8 @@ export default function GeneralDataDashboard() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <p className="text-sm font-medium">Muslim Restricted</p>
-                <p className="text-2xl font-bold">{mockMarketData.restrictedRevenue.muslim.toLocaleString()} Qu</p>
+                <div className="text-sm font-medium">Muslim Restricted</div>
+                <div className="text-2xl font-bold">{mockMarketData.restrictedRevenue.muslim.toLocaleString()} Qu</div>
               </div>
             </div>
           </CardContent>
