@@ -35,13 +35,7 @@ A modern, responsive dashboard application built with Next.js, TypeScript, and T
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone [your-repo-url]
-cd qcap-dashboard
-```
-
-2. Install dependencies:
+1. Install dependencies:
 ```bash
 # Using npm
 npm install
@@ -53,7 +47,7 @@ yarn install
 pnpm install
 ```
 
-3. Start the development server:
+2. Start the development server:
 ```bash
 # Using npm
 npm run dev
@@ -65,7 +59,7 @@ yarn dev
 pnpm dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
 ## Available Scripts
 
