@@ -31,7 +31,6 @@ export default function DashboardPage() {
             <div className="text-xl font-bold hidden sm:block">Analytics Dashboard</div>
           </div>
           
-          {/* Desktop Menu */}
           <div className="hidden sm:flex items-center gap-4">
             <Button variant="outline" className="gap-2 border-primary/50 hover:border-primary">
               <FileText className="h-4 w-4" />
@@ -43,7 +42,6 @@ export default function DashboardPage() {
             </Button>
           </div>
 
-          {/* Hamburger Menu Button */}
           <Button 
             variant="ghost" 
             className="sm:hidden"
@@ -53,7 +51,6 @@ export default function DashboardPage() {
           </Button>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="sm:hidden border-t border-border/40 bg-background/95 backdrop-blur">
             <div className="container py-4 space-y-2">

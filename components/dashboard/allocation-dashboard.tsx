@@ -23,7 +23,6 @@ export default function AllocationDashboard() {
   const [timeframe, setTimeframe] = useState("10")
   const [chartTimeframe, setChartTimeframe] = useState("100")
 
-  // Calculate burn statistics based on timeframe
   const getTimeframeData = (tf: string) => {
     const epochs = parseInt(tf)
     const recentData = mockBurnData.epochData.slice(-epochs)

@@ -17,7 +17,6 @@ export default function SplashScreen() {
     let lastValue = baseValue + Math.random() * (baseValue * 0.2)
 
     for (let i = 0; i < length; i++) {
-      // Add some randomness but keep the trend somewhat realistic
       const change = (Math.random() - 0.5) * volatility
       lastValue = Math.max(baseValue * 0.2, Math.min(baseValue * 2, lastValue + change))
       data.push(lastValue)
@@ -41,7 +40,6 @@ export default function SplashScreen() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    // Set canvas dimensions
     const setCanvasDimensions = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
@@ -50,7 +48,6 @@ export default function SplashScreen() {
     setCanvasDimensions()
     window.addEventListener("resize", setCanvasDimensions)
 
-    // Generate multiple chart datasets
     const charts = [
       {
         data: generateChartData(100, 5, 75),
@@ -84,7 +81,6 @@ export default function SplashScreen() {
       },
     ]
 
-    // Generate candlestick data
     const generateCandlesticks = (count: number) => {
       const sticks = []
       let lastClose = 50 + Math.random() * 20
@@ -104,29 +100,22 @@ export default function SplashScreen() {
 
     const candlesticks = generateCandlesticks(20)
 
-    // Animation variables
     let animationFrame: number
     let offset = 0
 
-    // Draw function
     const draw = () => {
-      // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Update offset for animation
       offset += 0.5
 
-      // Draw line charts
       charts.forEach((chart) => {
         const { data, color, lineColor, position, width, height, speed, label } = chart
         const chartOffset = (offset * speed) % (width / (data.length - 1))
 
-        // Draw chart label
         ctx.fillStyle = "rgba(255, 255, 255, 0.7)"
         ctx.font = "12px sans-serif"
         ctx.fillText(label, position.x + 10, position.y + 15)
 
-        // Draw area
         ctx.beginPath()
         ctx.moveTo(position.x - chartOffset, position.y + height)
 
@@ -146,7 +135,6 @@ export default function SplashScreen() {
         ctx.fillStyle = color
         ctx.fill()
 
-        // Draw line
         ctx.beginPath()
         data.forEach((value, index) => {
           const x = position.x + index * (width / (data.length - 1)) - chartOffset
@@ -163,7 +151,6 @@ export default function SplashScreen() {
         ctx.lineWidth = 2
         ctx.stroke()
 
-        // Draw duplicate to create seamless loop
         ctx.beginPath()
         ctx.moveTo(position.x + width - chartOffset, position.y + height)
 
@@ -183,7 +170,6 @@ export default function SplashScreen() {
         ctx.fillStyle = color
         ctx.fill()
 
-        // Draw line for duplicate
         ctx.beginPath()
         data.forEach((value, index) => {
           const x = position.x + index * (width / (data.length - 1)) + (width - chartOffset)
@@ -201,13 +187,11 @@ export default function SplashScreen() {
         ctx.stroke()
       })
 
-      // Draw candlesticks
       const candlestickWidth = 15
       const candlestickSpacing = 25
       const candlestickAreaHeight = 120
       const candlestickAreaY = canvas.height * 0.15
 
-      // Add label for candlestick chart
       ctx.fillStyle = "rgba(255, 255, 255, 0.7)"
       ctx.font = "12px sans-serif"
       ctx.fillText("QCAP/USD", canvas.width * 0.7, candlestickAreaY - 10)
@@ -222,7 +206,6 @@ export default function SplashScreen() {
         const isUp = stick.close >= stick.open
         const color = isUp ? "rgba(16, 185, 129, 0.7)" : "rgba(239, 68, 68, 0.7)"
 
-        // Draw wick
         ctx.beginPath()
         ctx.moveTo(x, candlestickAreaY + (100 - stick.high) * (candlestickAreaHeight / 100))
         ctx.lineTo(x, candlestickAreaY + (100 - stick.low) * (candlestickAreaHeight / 100))
@@ -230,7 +213,6 @@ export default function SplashScreen() {
         ctx.lineWidth = 1
         ctx.stroke()
 
-        // Draw body
         const bodyTop = candlestickAreaY + (100 - Math.max(stick.open, stick.close)) * (candlestickAreaHeight / 100)
         const bodyHeight = Math.abs(stick.open - stick.close) * (candlestickAreaHeight / 100)
 
@@ -238,7 +220,6 @@ export default function SplashScreen() {
         ctx.fillRect(x - candlestickWidth / 2, bodyTop, candlestickWidth, bodyHeight)
       })
 
-      // Draw price tickers
       const tickerY = canvas.height * 0.9
       const tickerHeight = 20
       const tickerWidth = 120
@@ -252,7 +233,6 @@ export default function SplashScreen() {
 
         if (x < -tickerWidth || x > canvas.width) continue
 
-        // Generate random price and change based on the pair
         let price, basePrice
 
         if (pair.includes("QCAP/USD")) {
@@ -271,11 +251,9 @@ export default function SplashScreen() {
         const change = Math.floor(Math.sin(i * 3 + offset * 0.02) * 500) / 100
         const isPositive = change >= 0
 
-        // Draw ticker background
         ctx.fillStyle = "rgba(17, 24, 39, 0.7)"
         ctx.fillRect(x, tickerY, tickerWidth, tickerHeight)
 
-        // Draw ticker text
         ctx.fillStyle = "rgba(255, 255, 255, 0.9)"
         ctx.font = "10px sans-serif"
         ctx.fillText(pair, x + 10, tickerY + 12)
@@ -285,11 +263,9 @@ export default function SplashScreen() {
         ctx.fillText(`$${price.toFixed(2)} ${isPositive ? "+" : ""}${change.toFixed(2)}%`, x + 10, tickerY + 24)
       }
 
-      // Draw grid lines
       ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"
       ctx.lineWidth = 1
 
-      // Horizontal grid lines
       for (let i = 0; i < 10; i++) {
         const y = i * (canvas.height / 10)
         ctx.beginPath()
@@ -298,7 +274,6 @@ export default function SplashScreen() {
         ctx.stroke()
       }
 
-      // Vertical grid lines
       for (let i = 0; i < 20; i++) {
         const x = i * (canvas.width / 20)
         ctx.beginPath()
@@ -307,7 +282,6 @@ export default function SplashScreen() {
         ctx.stroke()
       }
 
-      // Draw some random data points
       for (let i = 0; i < 50; i++) {
         const x = (Math.sin(i * 0.5 + offset * 0.01) * 0.5 + 0.5) * canvas.width
         const y = (Math.cos(i * 0.3 + offset * 0.02) * 0.5 + 0.5) * canvas.height
@@ -319,14 +293,11 @@ export default function SplashScreen() {
         ctx.fill()
       }
 
-      // Continue animation
       animationFrame = requestAnimationFrame(draw)
     }
 
-    // Start animation
     draw()
 
-    // Cleanup
     return () => {
       cancelAnimationFrame(animationFrame)
       window.removeEventListener("resize", setCanvasDimensions)

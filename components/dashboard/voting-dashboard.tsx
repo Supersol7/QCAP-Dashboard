@@ -15,7 +15,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-// Mock data - replace with actual API calls
 const mockQcapStaked = 1250000
 
 const mockTimeSeriesData = [
@@ -107,7 +106,6 @@ const mockAddressesEntitled = [
   "PLXEGMWKWTEFOALGIKWFOJSMGQTCHQTUXVPLTREJGBJDNPJBXYSQLPUBAZGK",
 ]
 
-// Add mock data for wallet staking and voting
 const mockWalletData = [
   {
     address: "GVWPFG...CHCNJ",
@@ -172,7 +170,6 @@ export default function VotingDashboard() {
   const votersPerPage = 5
   const [timePeriod, setTimePeriod] = useState("1D")
 
-  // Generate time-based data after initial render
   useEffect(() => {
     const getTimeRangeData = (period: string) => {
       const now = new Date()
@@ -180,7 +177,6 @@ export default function VotingDashboard() {
       
       switch (period) {
         case "1D":
-          // 12 two-hour intervals for 1 day
           for (let i = 12; i >= 0; i--) {
             const time = new Date(now.getTime() - (i * 2 * 60 * 60 * 1000))
             const baseValue = 500000
@@ -193,7 +189,6 @@ export default function VotingDashboard() {
           break
           
         case "7D":
-          // 7 daily points
           for (let i = 7; i >= 0; i--) {
             const time = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000))
             const baseValue = 500000
@@ -206,7 +201,6 @@ export default function VotingDashboard() {
           break
           
         case "1M":
-          // 15 two-day intervals for 1 month
           for (let i = 15; i >= 0; i--) {
             const time = new Date(now.getTime() - (i * 2 * 24 * 60 * 60 * 1000))
             const baseValue = 500000
@@ -219,7 +213,6 @@ export default function VotingDashboard() {
           break
           
         case "1Y":
-          // 12 monthly points
           for (let i = 12; i >= 0; i--) {
             const time = new Date(now.getTime() - (i * 30 * 24 * 60 * 60 * 1000))
             const baseValue = 500000
@@ -238,9 +231,8 @@ export default function VotingDashboard() {
       return data
     }
 
-    // Update time series data when time period changes
     setTimeSeriesData(getTimeRangeData(timePeriod))
-  }, [timePeriod]) // Only re-run when timePeriod changes
+  }, [timePeriod])
 
   const handleCopyAddress = (address: string) => {
     navigator.clipboard.writeText(address)

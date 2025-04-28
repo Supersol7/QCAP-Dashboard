@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card"
 export default function PreviewPage() {
   return (
     <div className="min-h-screen p-8 space-y-8">
-      {/* Color Palette Section */}
       <section className="space-y-4">
         <h2 className="text-2xl font-bold">Color Palette</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -27,7 +26,6 @@ export default function PreviewPage() {
         </div>
       </section>
 
-      {/* Gradient Examples */}
       <section className="space-y-4">
         <h2 className="text-2xl font-bold">Gradients</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -42,7 +40,6 @@ export default function PreviewPage() {
         </div>
       </section>
 
-      {/* UI Components */}
       <section className="space-y-4">
         <h2 className="text-2xl font-bold">UI Components</h2>
         <div className="grid gap-4">
