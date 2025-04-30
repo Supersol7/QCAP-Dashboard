@@ -960,7 +960,7 @@ export default function VotingDashboard({ isWalletConnected }: { isWalletConnect
           isOpen={isProposalDetailsModalOpen}
           onClose={() => setIsProposalDetailsModalOpen(false)}
           proposal={selectedProposal}
-          onVote={handleVote}
+          onVote={(proposalId: string, vote: "for" | "against") => handleVoteOnProposal(proposalId, vote)}
         >
           <Button
             onClick={() => handleVote("for")}
