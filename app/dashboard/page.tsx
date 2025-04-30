@@ -95,7 +95,7 @@ export default function DashboardPage() {
             <Button 
               onClick={handleConnectWallet}
               className={
-                isWalletConnected ? "w-full gap-2 glow-effect" : "w-full gap-2 border-primary/50 hover:border-primary"
+                isWalletConnected ? "w-full gap-2 glow-effect bg-green-600" : "w-full gap-2 border-primary/50"
               }
             >
               {isWalletConnected ? (
