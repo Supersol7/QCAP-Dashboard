@@ -12,7 +12,7 @@ import { SubmitProposalModal } from "@/components/dashboard/submit-proposal-moda
 import { ProposalDetailsModal } from "@/components/dashboard/proposal-details-modal"
 
 import { Button } from "@/components/ui/button"
-import { Plus, FileText, Wallet, Menu, UserCircle, ArrowRightLeft } from "lucide-react"
+import { Plus, FileText, Wallet, Menu, UserCircle, ArrowRightLeft, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
@@ -28,6 +28,9 @@ export default function DashboardPage() {
   const [isMuslimIdModalOpen, setIsMuslimIdModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isSubmitProposalModalOpen, setIsSubmitProposalModalOpen] = useState(false)
+  const [isProposalDetailsModalOpen, setIsProposalDetailsModalOpen] = useState(false)
+  const [selectedProposal, setSelectedProposal] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleConnectWallet = async () => {
     if (isWalletConnected) {
@@ -89,9 +92,20 @@ export default function DashboardPage() {
               <FileText className="h-4 w-4" />
               <span>Whitepaper</span>
             </Button>
-            <Button className="gap-2 glow-effect">
-              <Wallet className="h-4 w-4" />
-              <span>Connect Wallet</span>
+            <Button 
+              onClick={handleConnectWallet}
+              className={
+                isWalletConnected ? "w-full gap-2 glow-effect" : "w-full gap-2 border-primary/50 hover:border-primary"
+              }
+            >
+              {isWalletConnected ? (
+                <>
+                  <Wallet className="w-4 h-4 mr-2" />
+                  {walletAddress}
+                </>
+              ) : (
+                "Connect Wallet"
+              )}
             </Button>
           </div>
 
@@ -111,53 +125,81 @@ export default function DashboardPage() {
                 <FileText className="h-4 w-4" />
                 <span>Whitepaper</span>
               </Button>
-              <Button className="w-full gap-2 glow-effect">
-                <Wallet className="h-4 w-4" />
-                <span>Connect Wallet</span>
+              <Button 
+                onClick={handleConnectWallet}
+                className={
+                  isWalletConnected ? "w-full gap-2 glow-effect" : "w-full gap-2 border-primary/50 hover:border-primary"
+                }
+              >
+                {isWalletConnected ? (
+                  <>
+                    <Wallet className="w-4 h-4 mr-2" />
+                    {walletAddress}
+                  </>
+                ) : (
+                  "Connect Wallet"
+                )}
               </Button>
             </div>
           </div>
         )}
       </header>
       <main className="flex-1 container py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <Button
-            onClick={() => setIsPurchaseModalOpen(true)}
-            className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
-          >
-            <Plus className="w-6 h-6 mb-2" />
-            <span className="text-lg font-medium">Purchase QCAP</span>
-            <span className="text-xs text-gray-400 mt-1">Buy QCAP tokens</span>
-          </Button>
+        
+          {isWalletConnected ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <>
+                <Button
+                  onClick={() => setIsPurchaseModalOpen(true)}
+                  className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
+                >
+                  <Plus className="w-6 h-6 mb-2" />
+                  <span className="text-lg font-medium">Purchase QCAP</span>
+                  <span className="text-xs text-gray-400 mt-1">Buy QCAP tokens</span>
+                </Button>
 
-          <Button
-              onClick={() => setIsMuslimIdModalOpen(true)}
-              className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
-          >
-            <UserCircle className="w-6 h-6 mb-2" />
-            <span className="text-lg font-medium">MuslimID</span>
-            <span className="text-xs text-gray-400 mt-1">Register your wallet as MuslimID</span>
-          </Button>
+                <Button
+                  onClick={() => setIsMuslimIdModalOpen(true)}
+                  className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
+                >
+                  <UserCircle className="w-6 h-6 mb-2" />
+                  <span className="text-lg font-medium">MuslimID</span>
+                  <span className="text-xs text-gray-400 mt-1">Register your wallet as MuslimID</span>
+                </Button>
 
-          <Button
-              onClick={() => setIsTransferModalOpen(true)}
-              className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
-          >
-            <ArrowRightLeft className="w-6 h-6 mb-2" />
-            <span className="text-lg font-medium">Transfer Stocks</span>
-            <span className="text-xs text-gray-400 mt-1">Transfer between SCs</span>
-          </Button>
+                <Button
+                  onClick={() => setIsTransferModalOpen(true)}
+                  className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
+                >
+                  <ArrowRightLeft className="w-6 h-6 mb-2" />
+                  <span className="text-lg font-medium">Transfer Stocks</span>
+                  <span className="text-xs text-gray-400 mt-1">Transfer between SCs</span>
+                </Button>
 
-          <Button
-            onClick={() => setIsSubmitProposalModalOpen(true)}
-            className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
-          >
-            <FileText className="w-6 h-6 mb-2" />
-            <span className="text-lg font-medium">Submit Proposal</span>
-            <span className="text-xs text-gray-400 mt-1">Create a new proposal</span>
-          </Button>
+                <Button
+                  onClick={() => setIsSubmitProposalModalOpen(true)}
+                  className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
+                >
+                  <FileText className="w-6 h-6 mb-2" />
+                  <span className="text-lg font-medium">Submit Proposal</span>
+                  <span className="text-xs text-gray-400 mt-1">Create a new proposal</span>
+                </Button>
+              </>
+            </div>
+          ) : (
+            <div className="bg-[#1a2035] rounded-lg p-6 mb-6 flex flex-col items-center justify-center">
+              <AlertCircle className="w-12 h-12 text-blue-500 mb-3" />
+              <h3 className="text-xl font-medium mb-2">Wallet Not Connected</h3>
+              <p className="text-gray-400 text-center mb-4">
+                Connect your wallet to access QCAP features including purchasing, MuslimID registration, stock transfers,
+                and proposal submission.
+              </p>
+              <Button className="bg-[#0066FF] hover:bg-[#0052cc] text-white" onClick={handleConnectWallet}>
+                Connect Wallet
+              </Button>
+            </div>
+          )}
 
-        </div>
         <Tabs defaultValue="voting" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4 p-1 bg-secondary">            
             <TabsTrigger value="voting" className="data-[state=active]:bg-primary data-[state=active]:text-white">
@@ -211,7 +253,7 @@ export default function DashboardPage() {
         onClose={() => setIsSubmitProposalModalOpen(false)}
         onSubmit={handleSubmitProposal}
       />
-      
+
     </div>    
   )
 } 
