@@ -66,7 +66,7 @@ export function PurchaseQcapModal({ isOpen, onClose, onPurchase }: PurchaseQcapM
           <div className="col-span-4 mt-2">
             <div className="flex justify-between text-sm text-gray-400">
               <span>Estimated cost:</span>
-              <span>{(Number(amount) * 0.05).toFixed(2)} ETH</span>
+              <span>{(Number(amount) * 0.05).toFixed(2)} QU</span>
             </div>
           </div>
         </div>
