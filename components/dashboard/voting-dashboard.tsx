@@ -14,6 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { ProposalDetailsModal } from "./proposal-details-modal"
 
 const mockQcapStaked = 1250000
 
@@ -73,6 +74,76 @@ const mockProposals = [
     type: "Governance",
   },
 ]
+
+  // Updated mock active proposals to match the new structure
+  const activeProposals = [
+    {
+      id: "QCAP-1",
+      title: "Increase staking rewards",
+      type: "Parameter Change",
+      parameters: [
+        { name: "parameterName", label: "Parameter Name", type: "text", value: "stakingRewardRate" },
+        { name: "currentValue", label: "Current Value", type: "text", value: "5", suffix: "%" },
+        { name: "proposedValue", label: "Proposed Value", type: "text", value: "7", suffix: "%" },
+        { name: "effectiveDate", label: "Effective Date", type: "text", value: "2025-05-15" },
+      ],
+      participation: {
+        total: 676,
+        voted: 450,
+      },
+      votes: {
+        for: 280,
+        against: 170,
+      },
+      timeRemaining: "2 days",
+      status: "active",
+    },
+    {
+      id: "QCAP-2",
+      title: "Add new asset type",
+      type: "Asset Addition",
+      parameters: [
+        { name: "assetName", label: "Asset Name", type: "text", value: "QStable" },
+        { name: "assetSymbol", label: "Asset Symbol", type: "text", value: "QST" },
+        { name: "initialSupply", label: "Initial Supply", type: "number", value: "1,000,000" },
+        { name: "decimals", label: "Decimals", type: "number", value: "18" },
+        { name: "transferable", label: "Transferable", type: "text", value: "Yes" },
+      ],
+      participation: {
+        total: 676,
+        voted: 320,
+      },
+      votes: {
+        for: 180,
+        against: 140,
+      },
+      timeRemaining: "3 days",
+      status: "active",
+    },
+    {
+      id: "QCAP-3",
+      title: "Fund development team expansion",
+      type: "Funding",
+      parameters: [
+        { name: "projectName", label: "Project Name", type: "text", value: "Core Team Expansion" },
+        { name: "requestedAmount", label: "Requested Amount", type: "number", value: "500,000", suffix: "QCAP" },
+        { name: "fundingPeriod", label: "Funding Period", type: "number", value: "180", suffix: "days" },
+        { name: "expectedROI", label: "Expected ROI", type: "number", value: "15", suffix: "%" },
+        { name: "milestones", label: "Milestones", type: "text", value: "3 developers, 2 designers, 1 PM" },
+        { name: "teamSize", label: "Team Size", type: "number", value: "6" },
+      ],
+      participation: {
+        total: 676,
+        voted: 380,
+      },
+      votes: {
+        for: 290,
+        against: 90,
+      },
+      timeRemaining: "4 days",
+      status: "active",
+    },
+  ]
 
 const mockHistoricalProposals = Array(20)
   .fill(null)
@@ -159,7 +230,7 @@ const mockWalletData = [
   }
 ];
 
-export default function VotingDashboard() {
+export default function VotingDashboard({ isWalletConnected }: { isWalletConnected: boolean }) {
   const [historicalCount, setHistoricalCount] = useState(20)
   const [currentPage, setCurrentPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState<"all" | "passed" | "failed">("all")
@@ -169,6 +240,10 @@ export default function VotingDashboard() {
   const itemsPerPage = 5
   const votersPerPage = 5
   const [timePeriod, setTimePeriod] = useState("1D")
+
+  const [isProposalDetailsModalOpen, setIsProposalDetailsModalOpen] = useState(false)
+  const [selectedProposal, setSelectedProposal] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const getTimeRangeData = (period: string) => {
@@ -255,6 +330,36 @@ export default function VotingDashboard() {
       (statusFilter === "failed" && proposal.status === "Failed")
     )
 
+    const handleVoteOnProposal = async (proposalId: string, vote: "for" | "against") => {
+      console.log(`Voting ${vote} on proposal ${proposalId}`)
+      // Implement actual voting logic here
+      return new Promise<void>((resolve) => setTimeout(resolve, 1500))
+  }
+  
+  const openProposalDetails = (proposal: any) => {
+    if (!isWalletConnected) {
+      // If wallet is not connected, prompt to connect instead of showing details
+      return
+    }
+    setSelectedProposal(proposal)
+    setIsProposalDetailsModalOpen(true)
+  }
+
+  const handleVote = async (vote: "for" | "against") => {
+    if (!selectedProposal) return
+
+    setIsLoading(true)
+    try {
+      await handleVoteOnProposal(selectedProposal.id, vote)
+      // Optionally refresh proposals or update UI
+      console.log(`Voted ${vote} on proposal ${selectedProposal.id}`)
+    } catch (error) {
+      console.error("Error voting:", error)
+    } finally {
+      setIsLoading(false)
+      setIsProposalDetailsModalOpen(false)
+    }
+  }
   const totalPages = Math.ceil(filteredProposals.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
@@ -529,15 +634,18 @@ export default function VotingDashboard() {
           <CardTitle>Active Proposals</CardTitle>
           <CardDescription>Live results of each proposal (Total Computers: 676)</CardDescription>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
+        <CardContent className="overflow-x-auto space-y-6">
           <div className="min-w-[600px] space-y-8">
-            {mockProposals
-              .filter((p) => p.status === "Active")
+            {activeProposals
               .map((proposal) => (
-                <div key={proposal.id} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={proposal.votesFor > proposal.participatingComputers / 2 ? "default" : "outline"}>
+                <div 
+                  key={proposal.id} 
+                  className={`border border-[#1a2035] rounded-lg p-4 ${isWalletConnected ? "hover:bg-[#1a2035]/50 cursor-pointer" : ""} transition-colors`}
+                  onClick={() => isWalletConnected && openProposalDetails(proposal)}
+                >
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-3">
+                    <div className="flex items-center gap-2 mb-2 md:mb-0">
+                      <Badge variant={proposal.votes.for > proposal.participation.voted / 2 ? "default" : "outline"}>
                         {proposal.id}
                       </Badge>
                       <h3 className="font-semibold">{proposal.title}</h3>
@@ -553,39 +661,44 @@ export default function VotingDashboard() {
                   
                   {/* Participation Rate */}
                   <div className="flex justify-between text-sm">
-                    <span>Participation: {proposal.participatingComputers} / {proposal.totalComputers} computers</span>
-                    <span>{Math.round((proposal.participatingComputers / proposal.totalComputers) * 100)}%</span>
+                    <span>Participation: {proposal.participation.voted} / {proposal.participation.total} computers</span>
+                    <span>{Math.round((proposal.participation.voted / proposal.participation.total) * 100)}%</span>
                   </div>
                   <div className="flex gap-2">
                     <div className="w-full bg-muted rounded-full h-2.5">
                       <div
                         className="bg-primary/50 h-2.5 rounded-full"
-                        style={{ width: `${(proposal.participatingComputers / proposal.totalComputers) * 100}%` }}
+                        style={{ width: `${(proposal.participation.voted / proposal.participation.total) * 100}%` }}
                       ></div>
                     </div>
                   </div>
 
                   {/* Voting Results */}
                   <div className="flex justify-between text-sm">
-                    <span>Votes: For {proposal.votesFor} / Against {proposal.votesAgainst}</span>
-                    <span>{Math.round((proposal.votesFor / proposal.participatingComputers) * 100)}% in favor</span>
+                    <span>Votes: For {proposal.votes.for} / Against {proposal.votes.against}</span>
+                    <span>{Math.round((proposal.votes.for / proposal.participation.voted) * 100)}% in favor</span>
                   </div>
                   <div className="flex gap-2">
-                    <div className="w-full bg-muted rounded-full h-2.5">
+                    <div className="w-full bg-[#1a2035] rounded-full h-2.5">
                       <div
-                        className="bg-primary h-2.5 rounded-full"
-                        style={{ width: `${(proposal.votesFor / proposal.participatingComputers) * 100}%` }}
+                        className="bg-green-500 h-2.5 rounded-full"
+                        style={{ width: `${(proposal.votes.for / proposal.participation.voted) * 100}%` }}
                       ></div>
                     </div>
                   </div>
 
                   {/* Pass Threshold Indicator */}
                   <div className="relative w-full">
-                    <div className="absolute top-[-20px] left-1/2 w-px h-4 bg-red-500"></div>
-                    <div className="absolute top-[-10px] left-1/2 transform -translate-x-1/2 text-xs text-primary/50">
+                    <div className="absolute top-[-10px] left-1/2 w-px h-4 bg-red-500"></div>
+                    <div className="absolute top-[-0px] left-1/2 transform -translate-x-1/2 text-xs text-primary/50">
                       50% threshold
                     </div>
                   </div>
+                  {!isWalletConnected && (
+                    <div className="mt-4 pt-3 border-t border-[#1a2035] text-center">
+                      <p className="text-sm text-gray-400">Connect your wallet to vote on this proposal</p>
+                    </div>
+                  )}
                 </div>
               ))}
           </div>
@@ -841,6 +954,23 @@ export default function VotingDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {selectedProposal && (
+        <ProposalDetailsModal
+          isOpen={isProposalDetailsModalOpen}
+          onClose={() => setIsProposalDetailsModalOpen(false)}
+          proposal={selectedProposal}
+          onVote={handleVote}
+        >
+          <Button
+            onClick={() => handleVote("for")}
+            disabled={isLoading}
+            className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+          >
+            Vote For
+          </Button>
+        </ProposalDetailsModal>
+      )}
     </div>
   )
 }

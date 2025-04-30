@@ -64,10 +64,10 @@ export function ProposalDetailsModal({ isOpen, onClose, proposal, onVote }: Prop
     }
   }
 
-  const totalVotes = proposal.votes.for + proposal.votes.against
-  const forPercentage = totalVotes > 0 ? Math.round((proposal.votes.for / totalVotes) * 100) : 0
-  const againstPercentage = totalVotes > 0 ? Math.round((proposal.votes.against / totalVotes) * 100) : 0
-  const participationPercentage = Math.round((proposal.participation.voted / proposal.participation.total) * 100)
+  const totalVotes = proposal?.votes ? (proposal.votes.for + proposal.votes.against) : 0
+  const forPercentage = totalVotes > 0 ? Math.round((proposal?.votes?.for || 0) / totalVotes * 100) : 0
+  const againstPercentage = totalVotes > 0 ? Math.round((proposal?.votes?.against || 0) / totalVotes * 100) : 0
+  const participationPercentage = Math.round(((proposal?.participation?.voted || 0) / (proposal?.participation?.total || 1)) * 100)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -88,7 +88,7 @@ export function ProposalDetailsModal({ isOpen, onClose, proposal, onVote }: Prop
             <div>
               <h3 className="font-medium mb-2">Parameters</h3>
               <div className="grid grid-cols-1 gap-2">
-                {proposal.parameters.map((param) => (
+                {proposal?.parameters?.map((param) => (
                   <div key={param.name} className="bg-[#1a2035] p-3 rounded-md">
                     <div className="text-xs text-gray-400">{param.label}</div>
                     <div className="font-medium mt-1">
@@ -110,10 +110,10 @@ export function ProposalDetailsModal({ isOpen, onClose, proposal, onVote }: Prop
                       <span>For</span>
                     </div>
                     <span>
-                      {forPercentage}% ({proposal.votes.for})
+                      {forPercentage}% ({proposal?.votes?.for || 0})
                     </span>
                   </div>
-                  <Progress value={forPercentage} className="h-2 bg-[#1a2035]" indicatorClassName="bg-green-500" />
+                  <Progress value={forPercentage} className="h-2 bg-[#1a2035] [&>[role=progressbar]]:bg-green-500" />
                 </div>
 
                 <div>
@@ -123,20 +123,20 @@ export function ProposalDetailsModal({ isOpen, onClose, proposal, onVote }: Prop
                       <span>Against</span>
                     </div>
                     <span>
-                      {againstPercentage}% ({proposal.votes.against})
+                      {againstPercentage}% ({proposal?.votes?.against || 0})
                     </span>
                   </div>
-                  <Progress value={againstPercentage} className="h-2 bg-[#1a2035]" indicatorClassName="bg-red-500" />
+                  <Progress value={againstPercentage} className="h-2 bg-[#1a2035] [&>[role=progressbar]]:bg-red-500" />
                 </div>
 
                 <div className="pt-2">
                   <div className="flex justify-between mb-1">
                     <span>Participation</span>
                     <span>
-                      {participationPercentage}% ({proposal.participation.voted}/{proposal.participation.total})
+                      {participationPercentage}% ({proposal?.participation?.voted || 0}/{proposal?.participation?.total || 0})
                     </span>
                   </div>
-                  <Progress value={participationPercentage} className="h-2 bg-[#1a2035]" />
+                  <Progress value={participationPercentage} className="h-2 bg-[#1a2035] [&>[role=progressbar]]:bg-blue-500" />
                 </div>
               </div>
             </div>

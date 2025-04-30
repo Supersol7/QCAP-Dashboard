@@ -215,8 +215,8 @@ export default function DashboardPage() {
               Qearn
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="voting" className="space-y-4">
-            <VotingDashboard />
+          <TabsContent value="voting">
+            <VotingDashboard isWalletConnected={isWalletConnected} />
           </TabsContent>
           <TabsContent value="allocation" className="space-y-4">
             <AllocationDashboard />
