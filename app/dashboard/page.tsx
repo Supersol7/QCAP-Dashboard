@@ -5,15 +5,68 @@ import VotingDashboard from "@/components/dashboard/voting-dashboard"
 import AllocationDashboard from "@/components/dashboard/allocation-dashboard"
 import GeneralDataDashboard from "@/components/dashboard/general-data-dashboard"
 import QearnDashboard from "@/components/dashboard/qearn-dashboard"
+import { PurchaseQcapModal } from "@/components/dashboard/purchase-qcap-modal"
+import { MuslimIdModal } from "@/components/dashboard/muslim-id-modal"
+import { TransferStocksModal } from "@/components/dashboard/transfer-stocks-modal"
+import { SubmitProposalModal } from "@/components/dashboard/submit-proposal-modal"
+import { ProposalDetailsModal } from "@/components/dashboard/proposal-details-modal"
+
 import { Button } from "@/components/ui/button"
-import { FileText, Wallet, Menu } from "lucide-react"
+import { Plus, FileText, Wallet, Menu, UserCircle, ArrowRightLeft } from "lucide-react"
 import Image from "next/image"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useState } from "react"
 
 export default function DashboardPage() {
+
+  const [walletAddress, setWalletAddress] = useState<string>("")
+  const [isWalletConnected, setIsWalletConnected] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
+  const [isMuslimIdModalOpen, setIsMuslimIdModalOpen] = useState(false)
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
+  const [isSubmitProposalModalOpen, setIsSubmitProposalModalOpen] = useState(false)
+
+  const handleConnectWallet = async () => {
+    if (isWalletConnected) {
+      setIsWalletConnected(false)
+      setWalletAddress("")
+    } else {
+      try {
+        // In a real implementation, this would use Web3 libraries to connect to a wallet
+        setIsWalletConnected(true)
+        setWalletAddress("GVWPFG...CHCNJ") // Mock address
+      } catch (error) {
+        console.error("Failed to connect wallet:", error)
+      }
+    }
+  }
+
+  const handlePurchaseQcap = async (amount: number) => {
+    console.log(`Purchasing ${amount} QCAP`)
+    // Implement actual purchase logic here
+    return new Promise<void>((resolve) => setTimeout(resolve, 1500))
+  }
+
+  const handleRegisterMuslimId = async (name: string) => {
+    console.log(`Registering MuslimID for ${name} with wallet ${walletAddress}`)
+    // Implement actual registration logic here
+    return new Promise<void>((resolve) => setTimeout(resolve, 1500))
+  }
+
+  const handleTransferStocks = async (fromSC: string, toSC: string, amount: number) => {
+    console.log(`Transferring ${amount} stocks from ${fromSC} to ${toSC}`)
+    // Implement actual transfer logic here
+    return new Promise<void>((resolve) => setTimeout(resolve, 1500))
+  }
+
+  const handleSubmitProposal = async (proposalData: any) => {
+    console.log("Submitting proposal:", proposalData)
+    // Implement actual proposal submission logic here
+    return new Promise<void>((resolve) => setTimeout(resolve, 1500))
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -67,6 +120,44 @@ export default function DashboardPage() {
         )}
       </header>
       <main className="flex-1 container py-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Button
+            onClick={() => setIsPurchaseModalOpen(true)}
+            className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
+          >
+            <Plus className="w-6 h-6 mb-2" />
+            <span className="text-lg font-medium">Purchase QCAP</span>
+            <span className="text-xs text-gray-400 mt-1">Buy QCAP tokens</span>
+          </Button>
+
+          <Button
+              onClick={() => setIsMuslimIdModalOpen(true)}
+              className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
+          >
+            <UserCircle className="w-6 h-6 mb-2" />
+            <span className="text-lg font-medium">MuslimID</span>
+            <span className="text-xs text-gray-400 mt-1">Register your wallet as MuslimID</span>
+          </Button>
+
+          <Button
+              onClick={() => setIsTransferModalOpen(true)}
+              className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
+          >
+            <ArrowRightLeft className="w-6 h-6 mb-2" />
+            <span className="text-lg font-medium">Transfer Stocks</span>
+            <span className="text-xs text-gray-400 mt-1">Transfer between SCs</span>
+          </Button>
+
+          <Button
+            onClick={() => setIsSubmitProposalModalOpen(true)}
+            className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
+          >
+            <FileText className="w-6 h-6 mb-2" />
+            <span className="text-lg font-medium">Submit Proposal</span>
+            <span className="text-xs text-gray-400 mt-1">Create a new proposal</span>
+          </Button>
+
+        </div>
         <Tabs defaultValue="voting" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4 p-1 bg-secondary">            
             <TabsTrigger value="voting" className="data-[state=active]:bg-primary data-[state=active]:text-white">
@@ -96,6 +187,31 @@ export default function DashboardPage() {
           </TabsContent>
         </Tabs>
       </main>
-    </div>
+      <PurchaseQcapModal
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+        onPurchase={handlePurchaseQcap}
+      />
+
+      <MuslimIdModal
+        isOpen={isMuslimIdModalOpen}
+        onClose={() => setIsMuslimIdModalOpen(false)}
+        currentWalletAddress={walletAddress}
+        onRegister={handleRegisterMuslimId}
+      />
+
+      <TransferStocksModal
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+        onTransfer={handleTransferStocks}
+      />
+
+      <SubmitProposalModal
+        isOpen={isSubmitProposalModalOpen}
+        onClose={() => setIsSubmitProposalModalOpen(false)}
+        onSubmit={handleSubmitProposal}
+      />
+      
+    </div>    
   )
 } 
