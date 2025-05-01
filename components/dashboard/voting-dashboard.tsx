@@ -97,6 +97,7 @@ const mockProposals = [
       },
       timeRemaining: "2 days",
       status: "active",
+      userVote: "against"
     },
     {
       id: "QCAP-2",
@@ -119,6 +120,7 @@ const mockProposals = [
       },
       timeRemaining: "3 days",
       status: "active",
+      userVote: "for"
     },
     {
       id: "QCAP-3",
@@ -330,10 +332,10 @@ export default function VotingDashboard({ isWalletConnected }: { isWalletConnect
       (statusFilter === "failed" && proposal.status === "Failed")
     )
 
-    const handleVoteOnProposal = async (proposalId: string, vote: "for" | "against") => {
-      console.log(`Voting ${vote} on proposal ${proposalId}`)
-      // Implement actual voting logic here
-      return new Promise<void>((resolve) => setTimeout(resolve, 1500))
+  const handleVoteOnProposal = async (proposalId: string, vote: "for" | "against") => {
+    console.log(`Voting ${vote} on proposal ${proposalId}`)
+    // Implement actual voting logic here
+    return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
   
   const openProposalDetails = (proposal: any) => {
@@ -694,6 +696,22 @@ export default function VotingDashboard({ isWalletConnected }: { isWalletConnect
                       50% threshold
                     </div>
                   </div>
+
+                  {/* Add Voting Status Indicator */}
+                  {proposal.userVote && (
+                    <div className="mt-4 pt-3 border-t border-[#1a2035]">
+                      <div className="flex justify-end">
+                        <div className={`px-3 py-1.5 rounded-md text-sm ${
+                          proposal.userVote === "for" 
+                            ? "bg-green-500/10 text-green-500" 
+                            : "bg-red-500/10 text-red-500"
+                        }`}>
+                          Your vote: {proposal.userVote === "for" ? "For" : "Against"}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {!isWalletConnected && (
                     <div className="mt-4 pt-3 border-t border-[#1a2035] text-center">
                       <p className="text-sm text-gray-400">Connect your wallet to vote on this proposal</p>
@@ -961,15 +979,7 @@ export default function VotingDashboard({ isWalletConnected }: { isWalletConnect
           onClose={() => setIsProposalDetailsModalOpen(false)}
           proposal={selectedProposal}
           onVote={(proposalId: string, vote: "for" | "against") => handleVoteOnProposal(proposalId, vote)}
-        >
-          <Button
-            onClick={() => handleVote("for")}
-            disabled={isLoading}
-            className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
-          >
-            Vote For
-          </Button>
-        </ProposalDetailsModal>
+        />
       )}
     </div>
   )

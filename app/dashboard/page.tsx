@@ -10,6 +10,7 @@ import { MuslimIdModal } from "@/components/dashboard/muslim-id-modal"
 import { TransferStocksModal } from "@/components/dashboard/transfer-stocks-modal"
 import { SubmitProposalModal } from "@/components/dashboard/submit-proposal-modal"
 import { ProposalDetailsModal } from "@/components/dashboard/proposal-details-modal"
+import { ToastContainer, useToast } from "@/components/toast"
 
 import { Button } from "@/components/ui/button"
 import { Plus, FileText, Wallet, Menu, UserCircle, ArrowRightLeft, AlertCircle, LockIcon } from "lucide-react"
@@ -19,7 +20,9 @@ import Link from "next/link"
 import { useState } from "react"
 import { StakingModal } from "@/components/dashboard/staking-modal"
 
-export default function DashboardPage() {
+function Dashboard() {
+
+  const { showToast } = useToast()
 
   const [walletAddress, setWalletAddress] = useState<string>("")
   const [isWalletConnected, setIsWalletConnected] = useState(false)
@@ -43,13 +46,16 @@ export default function DashboardPage() {
     if (isWalletConnected) {
       setIsWalletConnected(false)
       setWalletAddress("")
+      showToast("Wallet disconnected", "warning")
     } else {
       try {
         // In a real implementation, this would use Web3 libraries to connect to a wallet
         setIsWalletConnected(true)
         setWalletAddress("GVWPFG...CHCNJ") // Mock address
+        showToast("Wallet connected", "success")
       } catch (error) {
         console.error("Failed to connect wallet:", error)
+        showToast("Failed to connect wallet", "error")
       }
     }
   }
@@ -57,6 +63,8 @@ export default function DashboardPage() {
   const handlePurchaseQcap = async (amount: number) => {
     console.log(`Purchasing ${amount} QCAP`)
     // Implement actual purchase logic here
+    setQcapBalance((prev) => prev + amount)
+    showToast(`Successfully purchased ${amount} QCAP`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
@@ -65,7 +73,7 @@ export default function DashboardPage() {
     // Implement actual staking logic here
     setQcapBalance((prev) => prev - amount)
     setStakedAmount((prev) => prev + amount)
-    // showToast(`Successfully staked ${amount} QCAP`, "success")
+    showToast(`Successfully staked ${amount} QCAP`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
@@ -74,25 +82,28 @@ export default function DashboardPage() {
     // Implement actual unstaking logic here
     setStakedAmount((prev) => prev - amount)
     setQcapBalance((prev) => prev + amount)
-    // showToast(`Unstaking ${amount} QCAP initiated. Available in 7 days.`, "success")
+    showToast(`Unstaking ${amount} QCAP initiated. Available in 7 days.`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
   const handleRegisterMuslimId = async (name: string) => {
     console.log(`Registering MuslimID for ${name} with wallet ${walletAddress}`)
     // Implement actual registration logic here
+    showToast(`MuslimID registration successful for ${name}`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
   const handleTransferStocks = async (fromSC: string, toSC: string, amount: number) => {
     console.log(`Transferring ${amount} stocks from ${fromSC} to ${toSC}`)
     // Implement actual transfer logic here
+    showToast(`Stocks transferred successfully from ${fromSC} to ${toSC}`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
   const handleSubmitProposal = async (proposalData: any) => {
     console.log("Submitting proposal:", proposalData)
     // Implement actual proposal submission logic here
+    showToast("Proposal submitted successfully", "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
@@ -301,3 +312,13 @@ export default function DashboardPage() {
     </div>    
   )
 } 
+
+
+
+export default function DashboardPage() {
+  return (
+    <ToastContainer>
+      <Dashboard />
+    </ToastContainer>
+  )
+}
