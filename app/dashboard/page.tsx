@@ -12,11 +12,12 @@ import { SubmitProposalModal } from "@/components/dashboard/submit-proposal-moda
 import { ProposalDetailsModal } from "@/components/dashboard/proposal-details-modal"
 
 import { Button } from "@/components/ui/button"
-import { Plus, FileText, Wallet, Menu, UserCircle, ArrowRightLeft, AlertCircle } from "lucide-react"
+import { Plus, FileText, Wallet, Menu, UserCircle, ArrowRightLeft, AlertCircle, LockIcon } from "lucide-react"
 import Image from "next/image"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useState } from "react"
+import { StakingModal } from "@/components/dashboard/staking-modal"
 
 export default function DashboardPage() {
 
@@ -24,11 +25,17 @@ export default function DashboardPage() {
   const [isWalletConnected, setIsWalletConnected] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Add QCAP balance state
+  const [qcapBalance, setQcapBalance] = useState<number>(5000)
+  const [stakedAmount, setStakedAmount] = useState<number>(2500)
+  const [stakingRewards, setStakingRewards] = useState<number>(175)
+
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
   const [isMuslimIdModalOpen, setIsMuslimIdModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [isSubmitProposalModalOpen, setIsSubmitProposalModalOpen] = useState(false)
   const [isProposalDetailsModalOpen, setIsProposalDetailsModalOpen] = useState(false)
+  const [isStakingModalOpen, setIsStakingModalOpen] = useState(false)
   const [selectedProposal, setSelectedProposal] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -50,6 +57,24 @@ export default function DashboardPage() {
   const handlePurchaseQcap = async (amount: number) => {
     console.log(`Purchasing ${amount} QCAP`)
     // Implement actual purchase logic here
+    return new Promise<void>((resolve) => setTimeout(resolve, 1500))
+  }
+
+  const handleStakeQcap = async (amount: number) => {
+    console.log(`Staking ${amount} QCAP`)
+    // Implement actual staking logic here
+    setQcapBalance((prev) => prev - amount)
+    setStakedAmount((prev) => prev + amount)
+    // showToast(`Successfully staked ${amount} QCAP`, "success")
+    return new Promise<void>((resolve) => setTimeout(resolve, 1500))
+  }
+
+  const handleUnstakeQcap = async (amount: number) => {
+    console.log(`Unstaking ${amount} QCAP`)
+    // Implement actual unstaking logic here
+    setStakedAmount((prev) => prev - amount)
+    setQcapBalance((prev) => prev + amount)
+    // showToast(`Unstaking ${amount} QCAP initiated. Available in 7 days.`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
@@ -147,7 +172,7 @@ export default function DashboardPage() {
       <main className="flex-1 container py-6">
         
           {isWalletConnected ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
               <>
                 <Button
                   onClick={() => setIsPurchaseModalOpen(true)}
@@ -156,6 +181,15 @@ export default function DashboardPage() {
                   <Plus className="w-6 h-6 mb-2" />
                   <span className="text-lg font-medium">Purchase QCAP</span>
                   <span className="text-xs text-gray-400 mt-1">Buy QCAP tokens</span>
+                </Button>
+
+                <Button
+                  onClick={() => setIsStakingModalOpen(true)}
+                  className="bg-[#1a2035] hover:bg-[#2a3045] text-white h-auto py-4 flex flex-col items-center"
+                >
+                  <LockIcon className="w-6 h-6 mb-2" />
+                  <span className="text-lg font-medium">Stake QCAP</span>
+                  <span className="text-xs text-gray-400 mt-1">Earn staking rewards</span>
                 </Button>
 
                 <Button
@@ -233,6 +267,16 @@ export default function DashboardPage() {
         isOpen={isPurchaseModalOpen}
         onClose={() => setIsPurchaseModalOpen(false)}
         onPurchase={handlePurchaseQcap}
+      />
+
+      <StakingModal
+        isOpen={isStakingModalOpen}
+        onClose={() => setIsStakingModalOpen(false)}
+        onStake={handleStakeQcap}
+        onUnstake={handleUnstakeQcap}
+        stakedAmount={stakedAmount}
+        qcapBalance={qcapBalance}
+        stakingRewards={stakingRewards}
       />
 
       <MuslimIdModal
