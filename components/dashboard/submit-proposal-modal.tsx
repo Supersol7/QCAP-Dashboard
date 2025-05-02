@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { LockIcon } from "lucide-react"
+import { LockIcon, Wallet } from "lucide-react"
 
 interface WalletAddress {
   address: string
@@ -167,7 +167,10 @@ export function SubmitProposalModal({ isOpen, onClose, onSubmit, walletAddresses
                   <SelectContent className="bg-[#131b31] border-[#2a3045] text-white">
                     {walletAddresses.map((wallet) => (
                       <SelectItem key={wallet.address} value={wallet.address}>
-                        {wallet.address}
+                        <div className="flex items-center">
+                            <Wallet className="h-3.5 w-3.5 mr-2 text-blue-400" />
+                            <span>{wallet.address}</span>
+                          </div>
                       </SelectItem>
                     ))}
                   </SelectContent>

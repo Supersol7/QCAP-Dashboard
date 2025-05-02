@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { CheckCircle } from "lucide-react"
+import { CheckCircle, Wallet } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface MuslimIdModalProps {
@@ -62,7 +62,10 @@ export function MuslimIdModal({ isOpen, onClose, walletAddresses, onRegister }: 
                     <SelectContent className="bg-[#1a2035] border-[#2a3045] text-white">
                       {walletAddresses.map((address) => (
                         <SelectItem key={address} value={address}>
-                          {address}
+                          <div className="flex items-center">
+                            <Wallet className="h-3.5 w-3.5 mr-2 text-blue-400" />
+                            <span>{address}</span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
