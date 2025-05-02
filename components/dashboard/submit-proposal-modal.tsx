@@ -13,11 +13,19 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { LockIcon } from "lucide-react"
+
+interface WalletAddress {
+  address: string
+  stakedAmount: number
+  balance: number
+}
 
 interface SubmitProposalModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (proposalData: ProposalData) => Promise<void>
+  walletAddresses: WalletAddress[]
 }
 
 // Replace the PROPOSAL_TYPES array with this updated version
@@ -94,15 +102,20 @@ const PROPOSAL_TYPES = [
 interface ProposalData {
   type: string
   parameters: Record<string, string>
+  walletAddress: string
 }
 
 // Update the component function to remove title and description
-export function SubmitProposalModal({ isOpen, onClose, onSubmit }: SubmitProposalModalProps) {
+export function SubmitProposalModal({ isOpen, onClose, onSubmit, walletAddresses }: SubmitProposalModalProps) {
   const [proposalType, setProposalType] = useState<string>("")
   const [parameters, setParameters] = useState<Record<string, string>>({})
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState<string>(
+    walletAddresses.length > 0 ? walletAddresses[0].address : "",
+  )
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const selectedType = PROPOSAL_TYPES.find((type) => type.id === proposalType)
+  const selectedWallet = walletAddresses.find((wallet) => wallet.address === selectedWalletAddress)
 
   const handleParameterChange = (param: string, value: string) => {
     setParameters((prev) => ({
@@ -117,6 +130,7 @@ export function SubmitProposalModal({ isOpen, onClose, onSubmit }: SubmitProposa
       await onSubmit({
         type: proposalType,
         parameters,
+        walletAddress: selectedWalletAddress,
       })
       onClose()
     } catch (error) {
@@ -128,11 +142,12 @@ export function SubmitProposalModal({ isOpen, onClose, onSubmit }: SubmitProposa
 
   const isValid =
     proposalType &&
-    selectedType?.parameters.every((param) => parameters[param.name] && parameters[param.name].trim() !== "")
+    selectedType?.parameters.every((param) => parameters[param.name] && parameters[param.name].trim() !== "") &&
+    selectedWalletAddress
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-[#0f1424] text-white border-[#1a2035]">
+      <DialogContent className="sm:max-w-[600px] md:max-w-[650px] bg-[#0a0e1a] text-white border-[#1a2035]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Submit Proposal</DialogTitle>
           <DialogDescription className="text-gray-400">
@@ -140,19 +155,42 @@ export function SubmitProposalModal({ isOpen, onClose, onSubmit }: SubmitProposa
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="proposalType" className="text-right">
-              Type
-            </Label>
-            <div className="col-span-3">
+          {/* Wallet Address Selector */}
+          <div className="bg-[#0f1424] p-4 rounded-md mb-4 flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="mb-1 text-sm">Wallet</div>
+              <div>
+                <Select value={selectedWalletAddress} onValueChange={setSelectedWalletAddress}>
+                  <SelectTrigger id="walletAddress" className="bg-[#131b31] border-[#2a3045] text-white w-full">
+                    <SelectValue placeholder="Select wallet address" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#131b31] border-[#2a3045] text-white">
+                    {walletAddresses.map((wallet) => (
+                      <SelectItem key={wallet.address} value={wallet.address}>
+                        {wallet.address}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedWallet && (
+                  <div className="mt-2 flex items-center text-sm text-blue-400">
+                    <LockIcon className="h-3.5 w-3.5 mr-1" />
+                    <span>{selectedWallet.stakedAmount.toLocaleString()} QCAP staked</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex-1">
+              <div className="mb-1 text-sm">Type</div>
               <Select onValueChange={setProposalType} value={proposalType}>
-                <SelectTrigger id="proposalType" className="bg-[#1a2035] border-[#2a3045] text-white">
+                <SelectTrigger id="proposalType" className="bg-[#131b31] border-[#2a3045] text-white w-full">
                   <SelectValue placeholder="Select proposal type" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a2035] border-[#2a3045] text-white">
+                <SelectContent className="bg-[#131b31] border-[#2a3045] text-white max-h-[300px]">
                   {PROPOSAL_TYPES.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
-                      {type.name} ({type.fee} QCAP, {type.duration})
+                      {type.name} ({type.fee} QCAP)
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -161,21 +199,21 @@ export function SubmitProposalModal({ isOpen, onClose, onSubmit }: SubmitProposa
           </div>
 
           {selectedType && (
-            <div className="col-span-4 mt-4">
+            <div className="mt-4">
               <h3 className="font-medium mb-3">Parameters</h3>
               <div className="space-y-4">
                 {selectedType.parameters.map((param) => (
-                  <div key={param.name} className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor={param.name} className="text-right">
+                  <div key={param.name} className="flex flex-col">
+                    <Label htmlFor={param.name} className="mb-2">
                       {param.label}
                     </Label>
-                    <div className="col-span-3 relative">
+                    <div className="relative">
                       <Input
                         id={param.name}
                         type={param.type}
                         value={parameters[param.name] || ""}
                         onChange={(e) => handleParameterChange(param.name, e.target.value)}
-                        className="bg-[#1a2035] border-[#2a3045] text-white pr-12"
+                        className="bg-[#131b31] border-[#2a3045] text-white pr-12 w-full"
                       />
                       {param.suffix && (
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">{param.suffix}</div>
@@ -183,19 +221,6 @@ export function SubmitProposalModal({ isOpen, onClose, onSubmit }: SubmitProposa
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-          )}
-
-          {selectedType && (
-            <div className="col-span-4 mt-2 p-4 bg-[#1a2035] rounded-md">
-              <div className="flex justify-between text-sm">
-                <span>Fee:</span>
-                <span className="font-medium">{selectedType.fee} QCAP</span>
-              </div>
-              <div className="flex justify-between text-sm mt-1">
-                <span>Voting Period:</span>
-                <span className="font-medium">{selectedType.duration}</span>
               </div>
             </div>
           )}

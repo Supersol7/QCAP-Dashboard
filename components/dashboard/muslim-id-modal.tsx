@@ -13,23 +13,24 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CheckCircle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface MuslimIdModalProps {
   isOpen: boolean
   onClose: () => void
-  currentWalletAddress: string
-  onRegister: (name: string) => Promise<void>
+  walletAddresses: string[] // Array of wallet addresses
+  onRegister: (address: string) => Promise<void>
 }
 
-export function MuslimIdModal({ isOpen, onClose, currentWalletAddress, onRegister }: MuslimIdModalProps) {
-  const [name, setName] = useState<string>("")
+export function MuslimIdModal({ isOpen, onClose, walletAddresses, onRegister }: MuslimIdModalProps) {
+  const [selectedAddress, setSelectedAddress] = useState<string>(walletAddresses[0] || "")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isRegistered, setIsRegistered] = useState<boolean>(false)
 
   const handleRegister = async () => {
     try {
       setIsLoading(true)
-      await onRegister(name)
+      await onRegister(selectedAddress)
       setIsRegistered(true)
     } catch (error) {
       console.error("Failed to register MuslimID:", error)
@@ -53,24 +54,20 @@ export function MuslimIdModal({ isOpen, onClose, currentWalletAddress, onRegiste
                 <Label htmlFor="wallet" className="text-right">
                   Wallet
                 </Label>
-                <Input
-                  id="wallet"
-                  value={currentWalletAddress}
-                  readOnly
-                  className="col-span-3 bg-[#1a2035] border-[#2a3045] text-gray-400"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="col-span-3 bg-[#1a2035] border-[#2a3045] text-white"
-                  placeholder="Enter your name"
-                />
+                <div className="col-span-3">
+                  <Select value={selectedAddress} onValueChange={setSelectedAddress}>
+                    <SelectTrigger id="wallet" className="bg-[#1a2035] border-[#2a3045] text-white">
+                      <SelectValue placeholder="Select wallet address" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a2035] border-[#2a3045] text-white">
+                      {walletAddresses.map((address) => (
+                        <SelectItem key={address} value={address}>
+                          {address}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
             <DialogFooter>
@@ -79,7 +76,7 @@ export function MuslimIdModal({ isOpen, onClose, currentWalletAddress, onRegiste
               </Button>
               <Button
                 onClick={handleRegister}
-                disabled={isLoading || !name}
+                disabled={isLoading || !selectedAddress}
                 className="bg-[#0066FF] hover:bg-[#0052cc] text-white"
               >
                 {isLoading ? "Processing..." : "Register"}

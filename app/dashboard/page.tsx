@@ -20,17 +20,29 @@ import Link from "next/link"
 import { useState } from "react"
 import { StakingModal } from "@/components/dashboard/staking-modal"
 
+// Define a type for proposal votes
+type ProposalVote = {
+  proposalId: string
+  vote: "for" | "against"
+}
+
+// Define a type for wallet addresses with balances
+interface WalletAddress {
+  address: string
+  stakedAmount: number
+  balance: number
+}
+
 function Dashboard() {
 
   const { showToast } = useToast()
 
-  const [walletAddress, setWalletAddress] = useState<string>("")
   const [isWalletConnected, setIsWalletConnected] = useState(false)
+  const [walletAddresses, setWalletAddresses] = useState<WalletAddress[]>([])
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState<string>("")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Add QCAP balance state
-  const [qcapBalance, setQcapBalance] = useState<number>(5000)
-  const [stakedAmount, setStakedAmount] = useState<number>(2500)
   const [stakingRewards, setStakingRewards] = useState<number>(175)
 
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
@@ -42,17 +54,36 @@ function Dashboard() {
   const [selectedProposal, setSelectedProposal] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  // Get the currently selected wallet's data
+  const selectedWallet = walletAddresses.find((w) => w.address === selectedWalletAddress) || {
+    address: "",
+    stakedAmount: 0,
+    balance: 0,
+  }
+
   const handleConnectWallet = async () => {
     if (isWalletConnected) {
+      // Disconnect wallet
       setIsWalletConnected(false)
-      setWalletAddress("")
+      setWalletAddresses([])
+      setSelectedWalletAddress("")
       showToast("Wallet disconnected", "warning")
     } else {
+      // Mock wallet connection with multiple addresses
       try {
         // In a real implementation, this would use Web3 libraries to connect to a wallet
         setIsWalletConnected(true)
-        setWalletAddress("GVWPFG...CHCNJ") // Mock address
-        showToast("Wallet connected", "success")
+
+        // Mock multiple wallet addresses with different staked amounts
+        const mockAddresses = [
+          { address: "0xf3B2...4D9e", stakedAmount: 2500, balance: 5000 },
+          { address: "0x71A5...8F2c", stakedAmount: 1200, balance: 3000 },
+          { address: "0x23D7...9E4a", stakedAmount: 800, balance: 1500 },
+        ]
+
+        setWalletAddresses(mockAddresses)
+        setSelectedWalletAddress(mockAddresses[0].address)
+        showToast(`Wallet connected with ${mockAddresses.length} addresses`, "success")
       } catch (error) {
         console.error("Failed to connect wallet:", error)
         showToast("Failed to connect wallet", "error")
@@ -61,35 +92,57 @@ function Dashboard() {
   }
 
   const handlePurchaseQcap = async (amount: number) => {
-    console.log(`Purchasing ${amount} QCAP`)
+    console.log(`Purchasing ${amount} QCAP for address ${selectedWalletAddress}`)
     // Implement actual purchase logic here
-    setQcapBalance((prev) => prev + amount)
+    setWalletAddresses((addresses) =>
+      addresses.map((wallet) =>
+        wallet.address === selectedWalletAddress ? { ...wallet, balance: wallet.balance + amount } : wallet,
+      ),
+    )
     showToast(`Successfully purchased ${amount} QCAP`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
   const handleStakeQcap = async (amount: number) => {
-    console.log(`Staking ${amount} QCAP`)
+    console.log(`Staking ${amount} QCAP from address ${selectedWalletAddress}`)
     // Implement actual staking logic here
-    setQcapBalance((prev) => prev - amount)
-    setStakedAmount((prev) => prev + amount)
+    setWalletAddresses((addresses) =>
+      addresses.map((wallet) =>
+        wallet.address === selectedWalletAddress
+          ? {
+              ...wallet,
+              balance: wallet.balance - amount,
+              stakedAmount: wallet.stakedAmount + amount,
+            }
+          : wallet,
+      ),
+    )
     showToast(`Successfully staked ${amount} QCAP`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
   const handleUnstakeQcap = async (amount: number) => {
-    console.log(`Unstaking ${amount} QCAP`)
+    console.log(`Unstaking ${amount} QCAP from address ${selectedWalletAddress}`)
     // Implement actual unstaking logic here
-    setStakedAmount((prev) => prev - amount)
-    setQcapBalance((prev) => prev + amount)
+    setWalletAddresses((addresses) =>
+      addresses.map((wallet) =>
+        wallet.address === selectedWalletAddress
+          ? {
+              ...wallet,
+              stakedAmount: wallet.stakedAmount - amount,
+              balance: wallet.balance + amount,
+            }
+          : wallet,
+      ),
+    )
     showToast(`Unstaking ${amount} QCAP initiated. Available in 7 days.`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
-  const handleRegisterMuslimId = async (name: string) => {
-    console.log(`Registering MuslimID for ${name} with wallet ${walletAddress}`)
+  const handleRegisterMuslimId = async (address: string, name: string) => {
+    console.log(`Registering MuslimID for ${name} with wallet address ${address}`)
     // Implement actual registration logic here
-    showToast(`MuslimID registration successful for ${name}`, "success")
+    showToast(`Successfully registered ${name} as MuslimID with address ${address}`, "success")
     return new Promise<void>((resolve) => setTimeout(resolve, 1500))
   }
 
@@ -137,7 +190,7 @@ function Dashboard() {
               {isWalletConnected ? (
                 <>
                   <Wallet className="w-4 h-4 mr-2" />
-                  {walletAddress}
+                  {selectedWalletAddress}
                 </>
               ) : (
                 "Connect Wallet"
@@ -170,7 +223,7 @@ function Dashboard() {
                 {isWalletConnected ? (
                   <>
                     <Wallet className="w-4 h-4 mr-2" />
-                    {walletAddress}
+                    {selectedWalletAddress}
                   </>
                 ) : (
                   "Connect Wallet"
@@ -278,6 +331,7 @@ function Dashboard() {
         isOpen={isPurchaseModalOpen}
         onClose={() => setIsPurchaseModalOpen(false)}
         onPurchase={handlePurchaseQcap}
+        walletAddresses={walletAddresses}
       />
 
       <StakingModal
@@ -285,15 +339,22 @@ function Dashboard() {
         onClose={() => setIsStakingModalOpen(false)}
         onStake={handleStakeQcap}
         onUnstake={handleUnstakeQcap}
-        stakedAmount={stakedAmount}
-        qcapBalance={qcapBalance}
+        stakedAmount={selectedWallet.stakedAmount}
+        qcapBalance={selectedWallet.balance}
         stakingRewards={stakingRewards}
       />
+
+      {/* <MuslimIdModal
+        isOpen={isMuslimIdModalOpen}
+        onClose={() => setIsMuslimIdModalOpen(false)}
+        currentWalletAddress={walletAddress}
+        onRegister={handleRegisterMuslimId}
+      /> */}
 
       <MuslimIdModal
         isOpen={isMuslimIdModalOpen}
         onClose={() => setIsMuslimIdModalOpen(false)}
-        currentWalletAddress={walletAddress}
+        walletAddresses={walletAddresses.map((w) => w.address)}
         onRegister={handleRegisterMuslimId}
       />
 
@@ -307,6 +368,7 @@ function Dashboard() {
         isOpen={isSubmitProposalModalOpen}
         onClose={() => setIsSubmitProposalModalOpen(false)}
         onSubmit={handleSubmitProposal}
+        walletAddresses={walletAddresses}
       />
 
     </div>    
