@@ -71,15 +71,15 @@ export function StakingModal({
           <DialogDescription className="text-gray-400">Stake your QCAP tokens to earn rewards</DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-4 py-4">
+        <div className="grid grid-cols-1 gap-4 py-4">
           <div className="bg-[#1a2035] p-4 rounded-md">
             <div className="text-sm text-gray-400">Total Staked</div>
             <div className="text-xl font-bold mt-1">{stakedAmount.toLocaleString()} QCAP</div>
           </div>
-          <div className="bg-[#1a2035] p-4 rounded-md">
+          {/* <div className="bg-[#1a2035] p-4 rounded-md">
             <div className="text-sm text-gray-400">Rewards Earned</div>
             <div className="text-xl font-bold mt-1 text-green-500">{stakingRewards.toLocaleString()} QCAP</div>
-          </div>
+          </div> */}
         </div>
 
         <Tabs defaultValue="stake" value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -119,7 +119,7 @@ export function StakingModal({
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1a2035] p-3 rounded-md">
+              {/* <div className="bg-[#1a2035] p-3 rounded-md">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Staking APR:</span>
                   <span className="text-green-500">7%</span>
@@ -128,7 +128,7 @@ export function StakingModal({
                   <span className="text-gray-400">Lock Period:</span>
                   <span>7 days</span>
                 </div>
-              </div>
+              </div> */}
               <Button
                 onClick={handleStake}
                 disabled={isLoading || !stakeAmount || Number(stakeAmount) <= 0 || Number(stakeAmount) > qcapBalance}
@@ -166,10 +166,10 @@ export function StakingModal({
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1a2035] p-3 rounded-md flex items-center gap-2">
+              {/* <div className="bg-[#1a2035] p-3 rounded-md flex items-center gap-2">
                 <Clock className="h-4 w-4 text-yellow-500" />
                 <span className="text-sm text-yellow-500">7 day unstaking period applies</span>
-              </div>
+              </div> */}
               <Button
                 onClick={handleUnstake}
                 disabled={
