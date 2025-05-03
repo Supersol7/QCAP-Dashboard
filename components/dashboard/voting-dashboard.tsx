@@ -978,7 +978,12 @@ export default function VotingDashboard({ isWalletConnected }: { isWalletConnect
           isOpen={isProposalDetailsModalOpen}
           onClose={() => setIsProposalDetailsModalOpen(false)}
           proposal={selectedProposal}
-          onVote={(proposalId: string, vote: "for" | "against") => handleVoteOnProposal(proposalId, vote)}
+          onVote={handleVoteOnProposal}
+          walletAddresses={mockWalletData.map(wallet => ({
+            address: wallet.address,
+            stakedAmount: wallet.stakedAmount,
+            balance: wallet.votingPower // Using votingPower as balance since we don't have a separate balance field
+          }))}
         />
       )}
     </div>

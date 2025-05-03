@@ -339,17 +339,9 @@ function Dashboard() {
         onClose={() => setIsStakingModalOpen(false)}
         onStake={handleStakeQcap}
         onUnstake={handleUnstakeQcap}
-        stakedAmount={selectedWallet.stakedAmount}
-        qcapBalance={selectedWallet.balance}
+        walletAddresses={walletAddresses}
         stakingRewards={stakingRewards}
       />
-
-      {/* <MuslimIdModal
-        isOpen={isMuslimIdModalOpen}
-        onClose={() => setIsMuslimIdModalOpen(false)}
-        currentWalletAddress={walletAddress}
-        onRegister={handleRegisterMuslimId}
-      /> */}
 
       <MuslimIdModal
         isOpen={isMuslimIdModalOpen}

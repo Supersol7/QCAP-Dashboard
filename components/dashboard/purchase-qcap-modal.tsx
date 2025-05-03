@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -33,6 +34,13 @@ export function PurchaseQcapModal({ isOpen, onClose, onPurchase, walletAddresses
     walletAddresses.length > 0 ? walletAddresses[0].address : "",
   )
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  // Set default wallet address when modal opens
+  React.useEffect(() => {
+    if (isOpen && walletAddresses.length > 0 && !selectedWalletAddress) {
+      setSelectedWalletAddress(walletAddresses[0].address)
+    }
+  }, [isOpen, walletAddresses, selectedWalletAddress])
 
   const handlePurchase = async () => {
     try {

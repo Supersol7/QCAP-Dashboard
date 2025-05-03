@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -11,7 +11,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
-import { CheckCircle, XCircle, Clock } from "lucide-react"
+import { CheckCircle, XCircle, Clock, Wallet } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
 
 // Updated interface to match the new proposal structure
 interface Parameter {
@@ -22,11 +23,18 @@ interface Parameter {
   suffix?: string
 }
 
+interface WalletAddress {
+  address: string
+  stakedAmount: number
+  balance: number
+}
+
 interface ProposalDetailsModalProps {
   isOpen: boolean
   onClose: () => void
   proposal: Proposal
-  onVote: (proposalId: string, vote: "for" | "against") => Promise<void>
+  onVote: (proposalId: string, vote: "for" | "against", walletAddress: string) => Promise<void>
+  walletAddresses: WalletAddress[]
 }
 
 interface Proposal {
@@ -48,20 +56,35 @@ interface Proposal {
   userVote?: "for" | "against"
 }
 
-export function ProposalDetailsModal({ isOpen, onClose, proposal, onVote }: ProposalDetailsModalProps) {
+export function ProposalDetailsModal({ isOpen, onClose, proposal, onVote, walletAddresses }: ProposalDetailsModalProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState<string>("")
   const [userVote, setUserVote] = useState<"for" | "against" | undefined>(proposal.userVote)
+
+  // Set default wallet address when modal opens
+  useEffect(() => {
+    if (isOpen && walletAddresses.length > 0 && !selectedWalletAddress) {
+      setSelectedWalletAddress(walletAddresses[0].address)
+    }
+  }, [isOpen, walletAddresses, selectedWalletAddress])
 
   const handleVote = async (vote: "for" | "against") => {
     try {
       setIsLoading(true)
-      await onVote(proposal.id, vote)
+      await onVote(proposal.id, vote, selectedWalletAddress)
       setUserVote(vote)
     } catch (error) {
       console.error("Failed to vote:", error)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Get the selected wallet's data
+  const selectedWallet = walletAddresses.find((w) => w.address === selectedWalletAddress) || {
+    address: "",
+    stakedAmount: 0,
+    balance: 0,
   }
 
   const totalVotes = proposal?.votes ? (proposal.votes.for + proposal.votes.against) : 0
@@ -83,6 +106,45 @@ export function ProposalDetailsModal({ isOpen, onClose, proposal, onVote }: Prop
           <DialogTitle className="text-xl font-bold mt-2">{proposal.title}</DialogTitle>
           <DialogDescription className="text-gray-400">Proposal ID: {proposal.id}</DialogDescription>
         </DialogHeader>
+
+        {/* Wallet Selector */}
+        <div className="bg-[#1a2035] p-4 rounded-md mb-4">
+          <div className="text-sm mb-2">Select wallet to vote with</div>
+          <Select value={selectedWalletAddress} onValueChange={setSelectedWalletAddress}>
+            <SelectTrigger className="bg-[#131b31] border-[#2a3045] text-white">
+              {selectedWalletAddress ? (
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center">
+                    <Wallet className="h-3.5 w-3.5 mr-2 text-blue-400" />
+                    <span className="truncate">{selectedWalletAddress}</span>
+                  </div>
+                  <div className="text-blue-400 text-sm ml-2">
+                    {walletAddresses.find((w) => w.address === selectedWalletAddress)?.stakedAmount.toLocaleString()}{" "}
+                    voting power
+                  </div>
+                </div>
+              ) : (
+                <div className="text-gray-400">Select wallet address</div>
+              )}
+            </SelectTrigger>
+            <SelectContent className="bg-[#131b31] border-[#2a3045] text-white max-h-[300px]">
+              {walletAddresses.map((wallet) => (
+                <SelectItem key={wallet.address} value={wallet.address}>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center">
+                      <Wallet className="h-3.5 w-3.5 mr-2 text-blue-400" />
+                      <span>{wallet.address}</span>
+                    </div>
+                    <div className="text-blue-400 text-sm ml-2">
+                      {wallet.stakedAmount.toLocaleString()} voting power
+                    </div>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
           <div className="space-y-4">
             <div>
@@ -147,7 +209,7 @@ export function ProposalDetailsModal({ isOpen, onClose, proposal, onVote }: Prop
             <>
               <Button
                 onClick={() => handleVote("against")}
-                disabled={isLoading}
+                disabled={isLoading || selectedWallet.stakedAmount <= 0}
                 variant="outline"
                 className="border-red-500 text-red-500 hover:bg-red-500/10 hover:text-red-400 w-full sm:w-auto"
               >
@@ -155,7 +217,7 @@ export function ProposalDetailsModal({ isOpen, onClose, proposal, onVote }: Prop
               </Button>
               <Button
                 onClick={() => handleVote("for")}
-                disabled={isLoading}
+                disabled={isLoading || selectedWallet.stakedAmount <= 0}
                 className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
               >
                 Vote For
