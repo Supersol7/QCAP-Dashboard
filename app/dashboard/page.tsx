@@ -76,9 +76,9 @@ function Dashboard() {
 
         // Mock multiple wallet addresses with different staked amounts
         const mockAddresses = [
-          { address: "0xf3B2...4D9e", stakedAmount: 2500, balance: 5000 },
-          { address: "0x71A5...8F2c", stakedAmount: 1200, balance: 3000 },
-          { address: "0x23D7...9E4a", stakedAmount: 800, balance: 1500 },
+          { address: "GVWPFG...4D9E", stakedAmount: 2500, balance: 5000 },
+          { address: "FREFAF...8F2C", stakedAmount: 1200, balance: 3000 },
+          { address: "GVWYER...9E4A", stakedAmount: 800, balance: 1500 },
         ]
 
         setWalletAddresses(mockAddresses)
@@ -366,8 +366,6 @@ function Dashboard() {
     </div>    
   )
 } 
-
-
 
 export default function DashboardPage() {
   return (
